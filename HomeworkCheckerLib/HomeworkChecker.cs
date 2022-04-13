@@ -6,7 +6,7 @@
     {
     }
 
-    public void ProcessMaster()
+    public void ProcessMaster(string masterFolder)
     {
     }
   }
