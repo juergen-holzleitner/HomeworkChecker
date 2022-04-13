@@ -19,7 +19,7 @@ namespace HomeworkCheckerLib
     internal IEnumerable<string> GetAllHomeWorkFolders(string folder)
     {
       var files = fileEnumerator.GetFilesInFolderRecursivly(folder, "*.java");
-      return files.Select(f => Path.GetDirectoryName(f)!);
+      return files.Select(f => Path.GetDirectoryName(f)!).Distinct();
     }
   }
 }

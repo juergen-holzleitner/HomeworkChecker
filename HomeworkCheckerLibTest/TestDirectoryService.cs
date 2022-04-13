@@ -23,7 +23,7 @@ namespace HomeworkCheckerLibTest
       public IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension)
       {
         extension.Should().Be("*.java");
-        return new List<string> { @"folderA\aaa.java", @"folderB\bbb.java" };
+        return new List<string> { @"folderA\aaa.java", @"folderB\bbb.java", @"folderB\bbb2.java" };
       }
     }
   }
