@@ -4,8 +4,10 @@
   {
     public HomeworkChecker()
     {
-      throw new NotImplementedException();
     }
 
+    public void ProcessMaster()
+    {
+    }
   }
 }
