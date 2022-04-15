@@ -20,8 +20,8 @@ namespace HomeworkCheckerLibTest
       var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
-              .Returns(new List<string> { @"arbitraryFolder\someFile.java" });
-      var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object);
+              .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
+      var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
 
       var result = sut.ProcessMaster(masterFolder);
 
@@ -30,6 +30,25 @@ namespace HomeworkCheckerLibTest
       result.CompileIssues.Issues.Should().BeEmpty();
 
       appExecuterMock.Verify(x => x.Execute("javac", "arbitraryFolder", "-Xlint \"someFile.java\""), Times.Once());
+    }
+
+    [Fact]
+    public void Print_error_if_compilation_failed()
+    {
+      var appExecuterMock = new Mock<IAppExecuter>();
+      appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(-1));
+      var outputMock = new Mock<IRuntimeOutput>();
+      const string masterFolder = @"arbitraryFolder";
+      var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
+      fileEnumeratorMock.Setup(
+        f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
+              .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
+      var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
+
+      sut.ProcessMaster("arbitraryFolder");
+
+      outputMock.Verify(o => o.WriteError("compiling someFile.java failed"), Times.Once());
     }
   }
 }
