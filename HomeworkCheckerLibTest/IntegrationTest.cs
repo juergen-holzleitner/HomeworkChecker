@@ -7,10 +7,10 @@ using Xunit;
 
 namespace HomeworkCheckerLibTest
 {
-  public class TestGeneralUsage
+  public class IntegrationTest
   {
     [Fact]
-    public void Can_create_HomeworkChecker_to_process_Master_folder()
+    public void Can_process_Master_folder()
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
