@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace HomeworkCheckerLib
+﻿namespace HomeworkCheckerLib
 {
   internal class DirectoryService
   {
