@@ -18,14 +18,14 @@ namespace HomeworkCheckerLib
       process.OutputDataReceived += (sender, args) => 
       {
         if (args.Data is not null)
-          output.Append(args.Data);
+          output.AppendLine(args.Data);
       };
 
       process.StartInfo.RedirectStandardError = true;
       process.ErrorDataReceived += (sender, args) =>
       {
         if (args.Data is not null)
-          output.Append(args.Data);
+          output.AppendLine(args.Data);
       };
 
       process.Start();
