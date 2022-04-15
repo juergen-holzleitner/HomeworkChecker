@@ -1,6 +1,6 @@
 ﻿namespace HomeworkCheckerLib
 {
-  internal class FileEnumerator : DirectoryService.IFileEnumerator
+  internal class FileEnumerator : FilesystemService.IFileEnumerator
   {
     public IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension)
     {

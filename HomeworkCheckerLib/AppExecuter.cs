@@ -15,7 +15,7 @@ namespace HomeworkCheckerLib
       process.StartInfo.RedirectStandardOutput = true;
       var output = new StringBuilder();
 
-      process.OutputDataReceived += (sender, args) => 
+      process.OutputDataReceived += (sender, args) =>
       {
         if (args.Data is not null)
           output.AppendLine(args.Data);

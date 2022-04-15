@@ -13,11 +13,11 @@ namespace HomeworkCheckerLibTest
     {
       const string folder = "arbitraryFolderName";
 
-      var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
+      var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(folder, "*.java"))
               .Returns(new List<string> { @"folderA\aaa.java", @"folderB\bbb.java", @"folderB\bbb2.java" });
-      var sut = new DirectoryService(fileEnumeratorMock.Object);
+      var sut = new FilesystemService(fileEnumeratorMock.Object);
 
       var files = sut.GetAllHomeWorkFolders(folder);
 
@@ -29,11 +29,11 @@ namespace HomeworkCheckerLibTest
     {
       const string folder = "arbitraryFolderName";
 
-      var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
+      var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(folder, "*.txt"))
               .Returns(new List<string> { "01.txt", "02.txt" });
-      var sut = new DirectoryService(fileEnumeratorMock.Object);
+      var sut = new FilesystemService(fileEnumeratorMock.Object);
 
       var files = sut.GetAllInputFiles(folder);
 

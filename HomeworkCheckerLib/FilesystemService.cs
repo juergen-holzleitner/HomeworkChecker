@@ -1,6 +1,6 @@
 ﻿namespace HomeworkCheckerLib
 {
-  internal class DirectoryService
+  internal class FilesystemService
   {
     internal interface IFileEnumerator
     {
@@ -9,7 +9,7 @@
 
     readonly IFileEnumerator fileEnumerator;
 
-    public DirectoryService(IFileEnumerator fileEnumerator)
+    public FilesystemService(IFileEnumerator fileEnumerator)
     {
       this.fileEnumerator = fileEnumerator;
     }

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HomeworkCheckerLib
+﻿namespace HomeworkCheckerLib
 {
   internal class InputGenerator
   {
-    private readonly DirectoryService directoryService;
+    private readonly FilesystemService directoryService;
 
     internal record Input(string Filename);
     internal record InputData(IEnumerable<Input> Inputs);
 
-    public InputGenerator(DirectoryService directoryService)
+    public InputGenerator(FilesystemService directoryService)
     {
       this.directoryService = directoryService;
     }

@@ -11,9 +11,9 @@
     {
     }
 
-    internal HomeworkChecker(DirectoryService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter, IRuntimeOutput output)
+    internal HomeworkChecker(FilesystemService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter, IRuntimeOutput output)
     {
-      directoryService = new DirectoryService(fileEnumerator);
+      directoryService = new FilesystemService(fileEnumerator);
       javaCompiler = new JavaCompiler(appExecuter);
       this.output = output;
     }
@@ -31,7 +31,7 @@
       return new(file, new(new List<string>()));
     }
 
-    readonly DirectoryService directoryService;
+    readonly FilesystemService directoryService;
     readonly JavaCompiler javaCompiler;
     private readonly IRuntimeOutput output;
   }

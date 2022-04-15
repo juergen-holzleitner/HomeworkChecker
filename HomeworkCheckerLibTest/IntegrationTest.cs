@@ -17,11 +17,11 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty));
 
       const string masterFolder = @"arbitraryFolder";
-      var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
+      var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
               .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
-      
+
       var outputMock = new Mock<IRuntimeOutput>();
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
@@ -44,7 +44,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty));
       var outputMock = new Mock<IRuntimeOutput>();
       const string masterFolder = @"arbitraryFolder";
-      var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
+      var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
               .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
