@@ -19,7 +19,7 @@ namespace HomeworkCheckerLibTest
 
       var input = sut.GetInputs(@"someFolder");
 
-      input.Inputs.Should().Equal(new List<InputGenerator.Input> { new("fileName", "fileContent") });
+      input.Inputs.Should().Equal(new List<HomeworkChecker.Input> { new("fileName", "fileContent") });
     }
 
 
