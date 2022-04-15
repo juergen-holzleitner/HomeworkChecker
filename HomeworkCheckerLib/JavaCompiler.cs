@@ -15,9 +15,12 @@ namespace HomeworkCheckerLib
       this.appExecuter = appExecuter;
     }
 
-    internal object CompileFile(string fileName)
+    internal object CompileFile(string javaFilePath)
     {
-      appExecuter.Execute("javac");
+      var workingDirectory = Path.GetDirectoryName(javaFilePath);
+      var javaFile = Path.GetFileName(javaFilePath);
+
+      appExecuter.Execute("javac", workingDirectory!, $"-Xlint \"{javaFile}\"");
       return null;
     }
   }
