@@ -2,7 +2,7 @@
 {
   public class HomeworkChecker
   {
-    public record CompileIssues(IList<string> Issues);
+    public record CompileIssues(IEnumerable<string> Issues);
 
     public record MasterResult(string MasterFile, CompileIssues CompileIssues);
 

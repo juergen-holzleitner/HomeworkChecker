@@ -24,5 +24,10 @@
     {
       return fileEnumerator.GetFilesInFolderRecursivly(folder, "*.java");
     }
+
+    internal IEnumerable<string> GetAllInputFiles(string folder)
+    {
+      return fileEnumerator.GetFilesInFolderRecursivly(folder, "*.txt");
+    }
   }
 }
