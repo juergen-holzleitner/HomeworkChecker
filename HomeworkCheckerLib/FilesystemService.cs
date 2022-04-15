@@ -5,6 +5,7 @@
     internal interface IFileEnumerator
     {
       IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension);
+      string ReadFileContent(string filePath);
     }
 
     readonly IFileEnumerator fileEnumerator;
@@ -23,6 +24,11 @@
     internal IEnumerable<string> GetAllJavaFiles(string folder)
     {
       return fileEnumerator.GetFilesInFolderRecursivly(folder, "*.java");
+    }
+
+    internal string ReadFileContent(string filePath)
+    {
+      return fileEnumerator.ReadFileContent(filePath);
     }
 
     internal IEnumerable<string> GetAllInputFiles(string folder)

@@ -13,12 +13,13 @@ namespace HomeworkCheckerLibTest
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(f => f.GetFilesInFolderRecursivly(It.IsAny<string>(), "*.txt")).Returns(new List<string> { "fileName.txt" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent("fileName.txt")).Returns("fileContent");
 
       var sut = new InputGenerator(new FilesystemService(fileEnumeratorMock.Object));
 
       var input = sut.GetInputs(@"someFolder");
 
-      input.Inputs.Should().Equal(new List<InputGenerator.Input> { new("fileName") });
+      input.Inputs.Should().Equal(new List<InputGenerator.Input> { new("fileName", "fileContent") });
     }
 
 

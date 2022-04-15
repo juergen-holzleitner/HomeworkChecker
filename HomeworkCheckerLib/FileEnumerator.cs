@@ -6,5 +6,10 @@
     {
       return Directory.GetFiles(folder, extension, searchOption: SearchOption.AllDirectories);
     }
+
+    public string ReadFileContent(string filePath)
+    {
+      return File.ReadAllText(filePath);
+    }
   }
 }
