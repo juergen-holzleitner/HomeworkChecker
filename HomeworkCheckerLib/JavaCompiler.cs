@@ -9,13 +9,17 @@
       this.appExecuter = appExecuter;
     }
 
-    internal object CompileFile(string javaFilePath)
+    internal CompileResult CompileFile(string javaFilePath)
     {
       var workingDirectory = Path.GetDirectoryName(javaFilePath);
       var javaFile = Path.GetFileName(javaFilePath);
 
-      appExecuter.Execute("javac", workingDirectory!, $"-Xlint \"{javaFile}\"");
-      return null;
+      var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-Xlint \"{javaFile}\"");
+
+      return new(executeResult.ExitCode == 0);
     }
+
+    internal record CompileResult(bool CompileSucceeded);
+
   }
 }

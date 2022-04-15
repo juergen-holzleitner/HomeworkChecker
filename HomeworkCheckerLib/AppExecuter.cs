@@ -4,7 +4,7 @@ namespace HomeworkCheckerLib
 {
   internal class AppExecuter : IAppExecuter
   {
-    public void Execute(string appName, string workingDirectory, string arguments)
+    public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments)
     {
       using var process = new Process();
       process.StartInfo.FileName = appName;
@@ -13,6 +13,8 @@ namespace HomeworkCheckerLib
 
       process.Start();
       process.WaitForExit();
+
+      return new(process.ExitCode);
     }
   }
 }

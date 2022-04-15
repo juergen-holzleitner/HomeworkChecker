@@ -2,6 +2,8 @@
 {
   internal interface IAppExecuter
   {
-    void Execute(string appName, string workingDirectory, string arguments);
+    record ExecutionResult(int ExitCode);
+
+    ExecutionResult Execute(string appName, string workingDirectory, string arguments);
   }
 }
