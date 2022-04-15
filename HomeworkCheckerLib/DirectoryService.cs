@@ -7,7 +7,7 @@
       IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension);
     }
 
-    IFileEnumerator fileEnumerator;
+    readonly IFileEnumerator fileEnumerator;
 
     public DirectoryService(IFileEnumerator fileEnumerator)
     {

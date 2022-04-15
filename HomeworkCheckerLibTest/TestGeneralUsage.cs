@@ -14,7 +14,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(0));
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty));
 
       const string masterFolder = @"arbitraryFolder";
       var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
@@ -37,7 +37,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(-1));
+                     .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty));
       var outputMock = new Mock<IRuntimeOutput>();
       const string masterFolder = @"arbitraryFolder";
       var fileEnumeratorMock = new Mock<DirectoryService.IFileEnumerator>();
