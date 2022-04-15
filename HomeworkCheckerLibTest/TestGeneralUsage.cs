@@ -21,7 +21,10 @@ namespace HomeworkCheckerLibTest
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
               .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
-      var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
+      
+      var outputMock = new Mock<IRuntimeOutput>();
+
+      var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
       var result = sut.ProcessMaster(masterFolder);
 
@@ -30,6 +33,7 @@ namespace HomeworkCheckerLibTest
       result.CompileIssues.Issues.Should().BeEmpty();
 
       appExecuterMock.Verify(x => x.Execute("javac", "arbitraryFolder", "-Xlint \"someFile.java\""), Times.Once());
+      outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
     }
 
     [Fact]

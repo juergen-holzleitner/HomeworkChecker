@@ -11,11 +11,11 @@
     {
     }
 
-    internal HomeworkChecker(DirectoryService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter, IRuntimeOutput ouput)
+    internal HomeworkChecker(DirectoryService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter, IRuntimeOutput output)
     {
       directoryService = new DirectoryService(fileEnumerator);
       javaCompiler = new JavaCompiler(appExecuter);
-      this.ouput = ouput;
+      this.output = output;
     }
 
     public MasterResult ProcessMaster(string masterFolder)
@@ -23,14 +23,16 @@
       var file = directoryService.GetAllJavaFiles(masterFolder).Single();
 
       var compileResult = javaCompiler.CompileFile(file);
-      if (!compileResult.CompileSucceeded)
-        ouput.WriteError($"compiling {compileResult.JavaFile} failed");
+      if (compileResult.CompileSucceeded)
+        output.WriteSuccess($"compiled {compileResult.JavaFile}");
+      else
+        output.WriteError($"compiling {compileResult.JavaFile} failed");
 
       return new(file, new(new List<string>()));
     }
 
     readonly DirectoryService directoryService;
     readonly JavaCompiler javaCompiler;
-    private readonly IRuntimeOutput ouput;
+    private readonly IRuntimeOutput output;
   }
 }
