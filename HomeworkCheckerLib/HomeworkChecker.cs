@@ -21,6 +21,7 @@
       inputGenerator = new InputGenerator(directoryService);
       outputGenerator = new OutputGenerator(appExecuter);
       checkstyleProcessor = new CheckstyleProcessor(appExecuter);
+      pmdProcessor = new PMDProcessor(appExecuter);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
@@ -58,6 +59,12 @@
       else
         output.WriteSuccess("checkstyle processed");
 
+      var pmdResult = pmdProcessor.Process(file);
+      if (pmdResult.ExitCode != 0 || !string.IsNullOrEmpty(pmdResult.PMDOutput))
+        output.WriteWarning("PMD issues");
+      else
+        output.WriteSuccess("PMD processed");
+
       return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput);
     }
 
@@ -90,5 +97,6 @@
     readonly InputGenerator inputGenerator;
     readonly OutputGenerator outputGenerator;
     readonly CheckstyleProcessor checkstyleProcessor;
+    readonly PMDProcessor pmdProcessor;
   }
 }

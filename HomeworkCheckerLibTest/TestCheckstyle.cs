@@ -13,7 +13,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
-      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), $"-jar \"checkstyle-10.1-all.jar\" -c google_checks_modified.xml \"file.java\""))
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), "-jar \"checkstyle-10.1-all.jar\" -c google_checks_modified.xml \"file.java\""))
         .Returns(new IAppExecuter.ExecutionResult(0, "Starting audit...\r\ncheckstyle outputAudit done.\r\n", false));
 
       var sut = new CheckstyleProcessor(appExecuterMock.Object);

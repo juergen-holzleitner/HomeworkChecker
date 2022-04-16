@@ -24,6 +24,8 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "checkstyle issues", false));
+      appExecuterMock.Setup(x => x.Execute("cmd.exe", Path.Combine("currentFolder", "pmd", "bin"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, "PMD issues", true));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
@@ -44,6 +46,7 @@ namespace HomeworkCheckerLibTest
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("checkstyle issues"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("PMD issues"));
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
@@ -62,6 +65,7 @@ namespace HomeworkCheckerLibTest
       result.CheckstyleIssues.Should().Be("checkstyle issues");
 
       outputMock.VerifyAll();
+      outputMock.Verify(o => o.WriteWarning("PMD issues"), Times.Once());
     }
 
     [Fact]
