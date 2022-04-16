@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(SolutionDir)HomeworkCheckerLib\pmd&quot; &quot;$(OutDir)pmd\&quot; /S /D /Y" />
+    <Exec Command="XCOPY &quot;$(SolutionDir)HomeworkCheckerLib\pmd&quot; &quot;$(OutDir)pmd\&quot; /S /D /Y&#xD;&#xA;XCOPY &quot;$(SolutionDir)HomeworkCheckerLib\spotbugs&quot; &quot;$(OutDir)spotbugs\&quot; /S /D /Y" />
   </Target>
 
 </Project>
