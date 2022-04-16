@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HomeworkCheckerLib
@@ -38,7 +39,23 @@ namespace HomeworkCheckerLib
 
     internal static void AnalyzeLine(int lineNumber, string line, StringBuilder sb)
     {
-      sb.AppendLine($"[line {lineNumber}] TODO {line}");
+      var checks = new List<(string regEx, string errorMessage)>()
+      {
+        new (@"format[^%]*\)", "use of format without %"),
+        new ("printf", "use of printf instead of format"),
+        new ("\"\"", "use of empty string"),
+        new (@"\s+[%\\]n", "space before newline"),
+        new (@"\\n", "use of \\n instead of %n"),
+        new (@"format\s*\(\s*""\s*[%\\]n\s*""\s*\)", "format is used to print a newline"),
+
+      };
+
+      foreach (var check in checks)
+      {
+        var regEx = new Regex(check.regEx);
+        if (regEx.IsMatch(line))
+          sb.AppendLine($"{lineNumber}: " + check.errorMessage);
+      }
     }
   }
 }

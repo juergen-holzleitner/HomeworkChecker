@@ -24,5 +24,23 @@ namespace HomeworkCheckerLibTest
 
       result.Should().Be(new CustomAnalysisProcessor.CustomAnalysisResult(string.Empty));
     }
+
+    [Theory]
+    [InlineData("str.format(\"abcd\");", 3, "3: use of format without %")]
+    [InlineData("println(\"\")", 1, "1: use of empty string")]
+    [InlineData("printf", 1, "1: use of printf instead of format")]
+    [InlineData("\"\"", 1, "1: use of empty string")]
+    [InlineData("\" %n\"", 1, "1: space before newline")]
+    [InlineData("\\n", 1, "1: use of \\n instead of %n")]
+    [InlineData("format(\"%n\")", 1, "1: format is used to print a newline")]
+
+    public void Can_detect_custom_errors(string codeLine, int lineNumber, string expectedError)
+    {
+      var sb = new StringBuilder();
+     
+      CustomAnalysisProcessor.AnalyzeLine(lineNumber, codeLine, sb);
+      
+      sb.ToString().Should().Be(expectedError + Environment.NewLine);
+    }
   }
 }
