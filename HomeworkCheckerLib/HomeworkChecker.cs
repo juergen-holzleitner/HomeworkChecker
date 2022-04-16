@@ -35,7 +35,10 @@
       output.WriteSuccess($"compiled {compileResult.JavaFile}");
 
       var outputs = GetProgramOutputs(compileResult.JavaFile, masterFolder);
-
+      foreach (var programOutput in outputs)
+      {
+        output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
+      }
       return new(file, string.Empty, outputs);
     }
 
