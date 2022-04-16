@@ -5,7 +5,7 @@ namespace HomeworkCheckerLib
 {
   internal class AppExecuter : IAppExecuter
   {
-    public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input)
+    public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input, int? timeout)
     {
       using var process = new Process();
       process.StartInfo.FileName = appName;
@@ -42,14 +42,21 @@ namespace HomeworkCheckerLib
 
       inputStream.Close();
 
-      process.WaitForExit();
+      bool hasTimedOut = false;
+      if (timeout.HasValue)
+      {
+        if (!process.WaitForExit(timeout.Value))
+          hasTimedOut = true;
+      }
+      else
+        process.WaitForExit();
 
-      return new(process.ExitCode, output.ToString());
+      return new(process.ExitCode, output.ToString(), hasTimedOut);
     }
 
     public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments)
     {
-      return Execute(appName, workingDirectory, arguments, null);
+      return Execute(appName, workingDirectory, arguments, null, null);
     }
   }
 }

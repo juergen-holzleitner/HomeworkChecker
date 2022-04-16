@@ -16,9 +16,9 @@ namespace HomeworkCheckerLibTest
 
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty));
-      appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n2\n3\n"))
-                     .Returns(new IAppExecuter.ExecutionResult(0, "1"));
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n2\n3\n", 5000))
+                     .Returns(new IAppExecuter.ExecutionResult(0, "1", false));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
@@ -52,7 +52,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty));
+                     .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty, false));
       var outputMock = new Mock<IRuntimeOutput>();
       const string masterFolder = @"arbitraryFolder";
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();

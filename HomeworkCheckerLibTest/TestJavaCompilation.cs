@@ -12,7 +12,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-               .Returns(new IAppExecuter.ExecutionResult(0, string.Empty));
+               .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
 
       var sut = new JavaCompiler(appExecuterMock.Object);
 
@@ -25,7 +25,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-               .Returns(new IAppExecuter.ExecutionResult(-1, "someFileName.java:4: error: <identifier> expected"));
+               .Returns(new IAppExecuter.ExecutionResult(-1, "someFileName.java:4: error: <identifier> expected", false));
 
       var sut = new JavaCompiler(appExecuterMock.Object);
 
