@@ -11,4 +11,8 @@
     <ProjectReference Include="..\HomeworkCheckerLib\HomeworkCheckerLib.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="XCOPY &quot;$(SolutionDir)HomeworkCheckerLib\pmd&quot; &quot;$(OutDir)pmd\&quot; /S /D /Y" />
+  </Target>
+
 </Project>
