@@ -10,6 +10,10 @@
     {
       WriteColoredOutput(message, ConsoleColor.Green);
     }
+    public void WriteWarning(string message)
+    {
+      WriteColoredOutput(message, ConsoleColor.Yellow);
+    }
 
     public void WriteInfo(string message)
     {
@@ -23,5 +27,6 @@
       Console.WriteLine(message);
       Console.ForegroundColor = currentColor;
     }
+
   }
 }
