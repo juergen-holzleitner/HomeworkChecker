@@ -6,7 +6,7 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues);
+    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -22,6 +22,7 @@
       outputGenerator = new OutputGenerator(appExecuter);
       checkstyleProcessor = new CheckstyleProcessor(appExecuter);
       pmdProcessor = new PMDProcessor(appExecuter);
+      spotBugsProcessor = new SpotBugsProcessor(appExecuter);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
@@ -65,7 +66,15 @@
       else
         output.WriteSuccess("PMD processed");
 
-      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput);
+      var spotBugsResult = spotBugsProcessor.Process(file);
+      if (spotBugsResult.ExitCode != 0)
+        output.WriteError("SpotBugs failed");
+      else if (!string.IsNullOrEmpty(spotBugsResult.SpotBugsOutput))
+        output.WriteWarning("SpotBugs issues");
+      else
+        output.WriteSuccess("SpotBugs processed");
+
+      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsResult.SpotBugsOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
@@ -98,5 +107,6 @@
     readonly OutputGenerator outputGenerator;
     readonly CheckstyleProcessor checkstyleProcessor;
     readonly PMDProcessor pmdProcessor;
+    readonly SpotBugsProcessor spotBugsProcessor;
   }
 }
