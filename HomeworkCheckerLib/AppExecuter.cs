@@ -13,6 +13,7 @@ namespace HomeworkCheckerLib
       process.StartInfo.Arguments = arguments;
 
       process.StartInfo.RedirectStandardOutput = true;
+      process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
       var output = new StringBuilder();
 
       process.OutputDataReceived += (sender, args) =>
@@ -22,6 +23,7 @@ namespace HomeworkCheckerLib
       };
 
       process.StartInfo.RedirectStandardError = true;
+      process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
       process.ErrorDataReceived += (sender, args) =>
       {
         if (args.Data is not null)
