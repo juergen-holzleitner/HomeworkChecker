@@ -6,7 +6,7 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues);
+    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -15,26 +15,27 @@
 
     internal HomeworkChecker(FilesystemService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter, IRuntimeOutput output)
     {
-      directoryService = new FilesystemService(fileEnumerator);
+      filesystemService = new FilesystemService(fileEnumerator);
       javaCompiler = new JavaCompiler(appExecuter);
       this.output = output;
-      inputGenerator = new InputGenerator(directoryService);
+      inputGenerator = new InputGenerator(filesystemService);
       outputGenerator = new OutputGenerator(appExecuter);
       checkstyleProcessor = new CheckstyleProcessor(appExecuter);
       pmdProcessor = new PMDProcessor(appExecuter);
       spotBugsProcessor = new SpotBugsProcessor(appExecuter);
+      customAnalysisProcessor = new CustomAnalysisProcessor(filesystemService);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
     {
       output.WriteInfo($"processing {masterFolder}");
 
-      var file = directoryService.GetAllJavaFiles(masterFolder).Single();
+      var javaFile = filesystemService.GetAllJavaFiles(masterFolder).Single();
 
       var compileOutput = string.Empty;
       IEnumerable<Output> outputs = Enumerable.Empty<Output>();
 
-      var compileResult = javaCompiler.CompileFile(file);
+      var compileResult = javaCompiler.CompileFile(javaFile);
       if (!compileResult.CompileSucceeded)
       {
         output.WriteError($"compiling {compileResult.JavaFile} failed");
@@ -54,13 +55,19 @@
         }
       }
 
-      var checkstyleResult = checkstyleProcessor.Process(file);
+      var customAnalysisResult = customAnalysisProcessor.Process(javaFile);
+      if (!string.IsNullOrEmpty(customAnalysisResult.CustomAnalysisOutput))
+        output.WriteWarning("custom analysis issues");
+      else
+        output.WriteSuccess("custom analysis processed");
+
+      var checkstyleResult = checkstyleProcessor.Process(javaFile);
       if (checkstyleResult.ExitCode != 0 || !string.IsNullOrEmpty(checkstyleResult.CheckstyleOutput))
         output.WriteWarning("checkstyle issues");
       else
         output.WriteSuccess("checkstyle processed");
 
-      var pmdResult = pmdProcessor.Process(file);
+      var pmdResult = pmdProcessor.Process(javaFile);
       if (pmdResult.ExitCode != 0 || !string.IsNullOrEmpty(pmdResult.PMDOutput))
         output.WriteWarning("PMD issues");
       else
@@ -69,7 +76,7 @@
       var spotBugsOutput = string.Empty;
       if (compileResult.CompileSucceeded)
       {
-        var spotBugsResult = spotBugsProcessor.Process(file);
+        var spotBugsResult = spotBugsProcessor.Process(javaFile);
         if (spotBugsResult.ExitCode != 0)
           output.WriteError("SpotBugs failed");
         else if (!string.IsNullOrEmpty(spotBugsResult.SpotBugsOutput))
@@ -79,7 +86,7 @@
         spotBugsOutput = spotBugsResult.SpotBugsOutput;
       }
 
-      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput);
+      return new(javaFile, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput, customAnalysisResult.CustomAnalysisOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
@@ -105,11 +112,12 @@
       }
     }
 
-    readonly FilesystemService directoryService;
+    readonly FilesystemService filesystemService;
     readonly JavaCompiler javaCompiler;
     readonly IRuntimeOutput output;
     readonly InputGenerator inputGenerator;
     readonly OutputGenerator outputGenerator;
+    readonly CustomAnalysisProcessor customAnalysisProcessor;
     readonly CheckstyleProcessor checkstyleProcessor;
     readonly PMDProcessor pmdProcessor;
     readonly SpotBugsProcessor spotBugsProcessor;

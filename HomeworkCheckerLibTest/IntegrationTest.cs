@@ -40,6 +40,7 @@ namespace HomeworkCheckerLibTest
 
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\0.txt")).Returns("1\n2\n3\n");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\1.txt")).Returns("1\n1\n1\n");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\someFile.java")).Returns("printf");
 
       var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
       var outputSequence = new MockSequence();
@@ -47,6 +48,7 @@ namespace HomeworkCheckerLibTest
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled someFile.java"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("custom analysis issues"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("checkstyle issues"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("PMD issues"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("SpotBugs failed"));
@@ -68,6 +70,7 @@ namespace HomeworkCheckerLibTest
       result.CheckstyleIssues.Should().Be("checkstyle issues");
       result.PMDIssues.Should().Be("PMD content");
       result.SpotBugsIssues.Should().Be("SpotBugs content");
+      result.CustomAnalysisIssues.Should().NotBeEmpty();
 
       outputMock.VerifyAll();
     }
@@ -86,6 +89,8 @@ namespace HomeworkCheckerLibTest
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
               .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\someFile.java")).Returns(string.Empty);
+
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
       var result = sut.ProcessMaster("arbitraryFolder");
