@@ -4,7 +4,7 @@
   {
     public record Input(string Filename, string FileContent);
 
-    public record Output(Input Input, string OutputContent);
+    public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
     public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs);
 
@@ -37,7 +37,10 @@
       var outputs = GetProgramOutputs(compileResult.JavaFile, masterFolder);
       foreach (var programOutput in outputs)
       {
-        output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
+        if (programOutput.HasTimedOut)
+          output.WriteError($"generation of output for {programOutput.Input.Filename} timed out");
+        else
+          output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
       }
       return new(file, string.Empty, outputs);
     }
@@ -48,7 +51,7 @@
       foreach (var input in inputs.Inputs)
       {
         var output = outputGenerator.GenerateOutput(fileName, folder, input.FileContent);
-        yield return new Output(input, output.Content);
+        yield return new Output(input, output.Content, output.HasTimedOut);
       }
     }
 

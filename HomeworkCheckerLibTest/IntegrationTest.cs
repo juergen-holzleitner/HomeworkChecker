@@ -19,6 +19,8 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n2\n3\n", 5000))
                      .Returns(new IAppExecuter.ExecutionResult(0, "1", false));
+      appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n1\n1\n", 5000))
+                     .Returns(new IAppExecuter.ExecutionResult(-1, "1", true));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
@@ -27,9 +29,10 @@ namespace HomeworkCheckerLibTest
 
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(masterFolder, "*.txt"))
-              .Returns(new List<string> { @$"{masterFolder}\0.txt" });
+              .Returns(new List<string> { @$"{masterFolder}\0.txt", @$"{masterFolder}\1.txt" });
 
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\0.txt")).Returns("1\n2\n3\n");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\1.txt")).Returns("1\n1\n1\n");
 
       var outputMock = new Mock<IRuntimeOutput>();
 
@@ -44,7 +47,13 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Verify(x => x.Execute("javac", "arbitraryFolder", "-Xlint \"someFile.java\""), Times.Once());
       outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
 
-      result.Outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new HomeworkChecker.Input("0", "1\n2\n3\n"), "1") });
+      result.Outputs.Should().Equal(new List<HomeworkChecker.Output> 
+      { 
+        new(new HomeworkChecker.Input("0", "1\n2\n3\n"), "1", false), 
+        new(new HomeworkChecker.Input("1", "1\n1\n1\n"), "1", true) 
+      });
+
+      outputMock.Verify(o => o.WriteError("generation of output for 1 timed out"));
     }
 
     [Fact]

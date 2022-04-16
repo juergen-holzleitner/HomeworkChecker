@@ -42,16 +42,15 @@ namespace HomeworkCheckerLib
 
       inputStream.Close();
 
-      bool hasTimedOut = false;
       if (timeout.HasValue)
       {
         if (!process.WaitForExit(timeout.Value))
-          hasTimedOut = true;
+          return new(-1, output.ToString(), true);
       }
       else
         process.WaitForExit();
 
-      return new(process.ExitCode, output.ToString(), hasTimedOut);
+      return new(process.ExitCode, output.ToString(), false);
     }
 
     public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments)
