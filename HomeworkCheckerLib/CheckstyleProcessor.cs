@@ -21,7 +21,16 @@ namespace HomeworkCheckerLib
     {
       var currentFolder = appExecuter.GetCurrentFolder();
       var result = appExecuter.Execute("java", Path.Combine(currentFolder, "checkstyle"), $"-jar \"checkstyle-10.1-all.jar\" -c google_checks_modified.xml \"{javaPath}\"");
-      return new(result.ExitCode, result.Output);
+      var output = CleanOutput(result.Output);
+      return new(result.ExitCode, output);
+    }
+
+    internal static string CleanOutput(string output)
+    {
+      output = output.Replace("Starting audit...\r\n", string.Empty);
+      output = output.Replace("Audit done.\r\n", string.Empty);
+
+      return output.Trim();
     }
   }
 }
