@@ -66,15 +66,20 @@
       else
         output.WriteSuccess("PMD processed");
 
-      var spotBugsResult = spotBugsProcessor.Process(file);
-      if (spotBugsResult.ExitCode != 0)
-        output.WriteError("SpotBugs failed");
-      else if (!string.IsNullOrEmpty(spotBugsResult.SpotBugsOutput))
-        output.WriteWarning("SpotBugs issues");
-      else
-        output.WriteSuccess("SpotBugs processed");
+      var spotBugsOutput = string.Empty;
+      if (compileResult.CompileSucceeded)
+      {
+        var spotBugsResult = spotBugsProcessor.Process(file);
+        if (spotBugsResult.ExitCode != 0)
+          output.WriteError("SpotBugs failed");
+        else if (!string.IsNullOrEmpty(spotBugsResult.SpotBugsOutput))
+          output.WriteWarning("SpotBugs issues");
+        else
+          output.WriteSuccess("SpotBugs processed");
+        spotBugsOutput = spotBugsResult.SpotBugsOutput;
+      }
 
-      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsResult.SpotBugsOutput);
+      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)

@@ -93,6 +93,8 @@ namespace HomeworkCheckerLibTest
       outputMock.Verify(o => o.WriteError("compiling someFile.java failed"), Times.Once());
       result.Outputs.Should().BeEmpty();
 
+      appExecuterMock.Verify(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()), Times.Never());
+
     }
   }
 }
