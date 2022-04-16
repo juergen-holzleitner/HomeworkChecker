@@ -6,7 +6,7 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs);
+    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -20,6 +20,7 @@
       this.output = output;
       inputGenerator = new InputGenerator(directoryService);
       outputGenerator = new OutputGenerator(appExecuter);
+      checkstyleProcessor = new CheckstyleProcessor(appExecuter);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
@@ -28,11 +29,14 @@
 
       var file = directoryService.GetAllJavaFiles(masterFolder).Single();
 
+      var checkstyleResult = checkstyleProcessor.Process(file);
+      output.WriteSuccess("checkstyle processed");
+
       var compileResult = javaCompiler.CompileFile(file);
       if (!compileResult.CompileSucceeded)
       {
         output.WriteError($"compiling {compileResult.JavaFile} failed");
-        return new(file, compileResult.CompileOutput, new List<Output>());
+        return new(file, compileResult.CompileOutput, new List<Output>(), checkstyleResult.CheckstyleOutput);
       }
       output.WriteSuccess($"compiled {compileResult.JavaFile}");
 
@@ -44,7 +48,7 @@
         else
           output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
       }
-      return new(file, string.Empty, outputs);
+      return new(file, string.Empty, outputs, checkstyleResult.CheckstyleOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
@@ -75,5 +79,6 @@
     readonly IRuntimeOutput output;
     readonly InputGenerator inputGenerator;
     readonly OutputGenerator outputGenerator;
+    readonly CheckstyleProcessor checkstyleProcessor;
   }
 }

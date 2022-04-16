@@ -21,6 +21,9 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, "1", false));
       appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n1\n1\n", 5000))
                      .Returns(new IAppExecuter.ExecutionResult(-1, "1", true));
+      appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, "checkstyle issues", false));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
@@ -44,10 +47,9 @@ namespace HomeworkCheckerLibTest
       result.MasterFile.Should().Be(Path.Combine(expectedMasterFile));
       result.CompileIssues.Should().BeEmpty();
 
-      appExecuterMock.Verify(x => x.Execute("javac", "arbitraryFolder", "-Xlint \"someFile.java\""), Times.Once());
-      outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
       outputMock.Verify(o => o.WriteInfo("processing arbitraryFolder"));
-
+      outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
+      outputMock.Verify(o => o.WriteSuccess("checkstyle processed"));
 
       result.Outputs.Should().Equal(new List<HomeworkChecker.Output>
       {
@@ -56,6 +58,8 @@ namespace HomeworkCheckerLibTest
       });
 
       outputMock.Verify(o => o.WriteError("generation of output for 1 timed out"));
+
+      result.CheckstyleIssues.Should().Be("checkstyle issues");
     }
 
     [Fact]
@@ -64,6 +68,8 @@ namespace HomeworkCheckerLibTest
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty, false));
+      appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
+
       var outputMock = new Mock<IRuntimeOutput>();
       const string masterFolder = @"arbitraryFolder";
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
