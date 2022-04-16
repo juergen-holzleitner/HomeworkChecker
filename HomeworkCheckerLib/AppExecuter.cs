@@ -59,5 +59,7 @@ namespace HomeworkCheckerLib
     {
       return Execute(appName, workingDirectory, arguments, null, null);
     }
+
+    public string GetCurrentFolder() => Directory.GetCurrentDirectory();
   }
 }

@@ -6,5 +6,6 @@
 
     ExecutionResult Execute(string appName, string workingDirectory, string arguments);
     ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input, int? timeout);
+    string GetCurrentFolder();
   }
 }
