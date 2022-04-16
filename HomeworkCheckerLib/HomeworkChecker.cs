@@ -6,7 +6,7 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues);
+    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -65,7 +65,7 @@
       else
         output.WriteSuccess("PMD processed");
 
-      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput);
+      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
