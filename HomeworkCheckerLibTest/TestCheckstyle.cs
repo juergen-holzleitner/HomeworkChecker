@@ -29,8 +29,6 @@ namespace HomeworkCheckerLibTest
     [InlineData("Audit done.\r\n ", "")]
     public void Can_clean_checkstyle_output(string output, string expectedCleanedOutput)
     {
-      var sut = new CheckstyleProcessor(Mock.Of<IAppExecuter>());
-
       var cleanedOutput = CheckstyleProcessor.CleanOutput(output);
 
       cleanedOutput.Should().Be(expectedCleanedOutput);

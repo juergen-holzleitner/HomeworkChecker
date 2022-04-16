@@ -29,29 +29,36 @@
 
       var file = directoryService.GetAllJavaFiles(masterFolder).Single();
 
+      var compileOutput = string.Empty;
+      IEnumerable<Output> outputs = Enumerable.Empty<Output>();
+
+      var compileResult = javaCompiler.CompileFile(file);
+      if (!compileResult.CompileSucceeded)
+      {
+        output.WriteError($"compiling {compileResult.JavaFile} failed");
+        compileOutput = compileResult.CompileOutput;
+      }
+      else
+      {
+        output.WriteSuccess($"compiled {compileResult.JavaFile}");
+
+        outputs = GetProgramOutputs(compileResult.JavaFile, masterFolder);
+        foreach (var programOutput in outputs)
+        {
+          if (programOutput.HasTimedOut)
+            output.WriteError($"generation of output for {programOutput.Input.Filename} timed out");
+          else
+            output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
+        }
+      }
+
       var checkstyleResult = checkstyleProcessor.Process(file);
       if (checkstyleResult.ExitCode != 0 || !string.IsNullOrEmpty(checkstyleResult.CheckstyleOutput))
         output.WriteWarning("checkstyle issues");
       else
         output.WriteSuccess("checkstyle processed");
 
-      var compileResult = javaCompiler.CompileFile(file);
-      if (!compileResult.CompileSucceeded)
-      {
-        output.WriteError($"compiling {compileResult.JavaFile} failed");
-        return new(file, compileResult.CompileOutput, new List<Output>(), checkstyleResult.CheckstyleOutput);
-      }
-      output.WriteSuccess($"compiled {compileResult.JavaFile}");
-
-      var outputs = GetProgramOutputs(compileResult.JavaFile, masterFolder);
-      foreach (var programOutput in outputs)
-      {
-        if (programOutput.HasTimedOut)
-          output.WriteError($"generation of output for {programOutput.Input.Filename} timed out");
-        else
-          output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
-      }
-      return new(file, string.Empty, outputs, checkstyleResult.CheckstyleOutput);
+      return new(file, compileOutput, outputs, checkstyleResult.CheckstyleOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)

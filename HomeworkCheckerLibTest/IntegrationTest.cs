@@ -37,7 +37,13 @@ namespace HomeworkCheckerLibTest
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\0.txt")).Returns("1\n2\n3\n");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\1.txt")).Returns("1\n1\n1\n");
 
-      var outputMock = new Mock<IRuntimeOutput>();
+      var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
+      var outputSequence = new MockSequence();
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing arbitraryFolder"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("checkstyle issues"));
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
@@ -47,19 +53,15 @@ namespace HomeworkCheckerLibTest
       result.MasterFile.Should().Be(Path.Combine(expectedMasterFile));
       result.CompileIssues.Should().BeEmpty();
 
-      outputMock.Verify(o => o.WriteInfo("processing arbitraryFolder"));
-      outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
-      outputMock.Verify(o => o.WriteWarning("checkstyle issues"));
-
       result.Outputs.Should().Equal(new List<HomeworkChecker.Output>
       {
         new(new HomeworkChecker.Input("0", "1\n2\n3\n"), "1", false),
         new(new HomeworkChecker.Input("1", "1\n1\n1\n"), "1", true)
       });
 
-      outputMock.Verify(o => o.WriteError("generation of output for 1 timed out"));
-
       result.CheckstyleIssues.Should().Be("checkstyle issues");
+
+      outputMock.VerifyAll();
     }
 
     [Fact]
