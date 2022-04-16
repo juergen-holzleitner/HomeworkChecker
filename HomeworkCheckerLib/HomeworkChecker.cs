@@ -30,7 +30,7 @@
 
       var compileResult = javaCompiler.CompileFile(file);
       if (!compileResult.CompileSucceeded)
-      { 
+      {
         output.WriteError($"compiling {compileResult.JavaFile} failed");
         return new(file, compileResult.CompileOutput, new List<Output>());
       }
@@ -49,11 +49,24 @@
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
     {
-      var inputs = inputGenerator.GetInputs(folder);
-      foreach (var input in inputs.Inputs)
+      var inputData = inputGenerator.GetInputs(folder);
+      return GetProgramOutputs(fileName, folder, inputData);
+    }
+
+    internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder, InputGenerator.InputData inputData)
+    {
+      if (inputData.Inputs.Any())
       {
-        var output = outputGenerator.GenerateOutput(fileName, folder, input.FileContent);
-        yield return new Output(input, output.Content, output.HasTimedOut);
+        foreach (var input in inputData.Inputs)
+        {
+          var output = outputGenerator.GenerateOutput(fileName, folder, input.FileContent);
+          yield return new Output(input, output.Content, output.HasTimedOut);
+        }
+      }
+      else
+      {
+        var output = outputGenerator.GenerateOutput(fileName, folder, null);
+        yield return new Output(new("<no input>", string.Empty), output.Content, output.HasTimedOut);
       }
     }
 

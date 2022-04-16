@@ -49,10 +49,10 @@ namespace HomeworkCheckerLibTest
       outputMock.Verify(o => o.WriteInfo("processing arbitraryFolder"));
 
 
-      result.Outputs.Should().Equal(new List<HomeworkChecker.Output> 
-      { 
-        new(new HomeworkChecker.Input("0", "1\n2\n3\n"), "1", false), 
-        new(new HomeworkChecker.Input("1", "1\n1\n1\n"), "1", true) 
+      result.Outputs.Should().Equal(new List<HomeworkChecker.Output>
+      {
+        new(new HomeworkChecker.Input("0", "1\n2\n3\n"), "1", false),
+        new(new HomeworkChecker.Input("1", "1\n1\n1\n"), "1", true)
       });
 
       outputMock.Verify(o => o.WriteError("generation of output for 1 timed out"));
