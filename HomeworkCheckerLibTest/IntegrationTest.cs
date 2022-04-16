@@ -23,7 +23,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(-1, "1", true));
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(-1, "checkstyle issues", false));
+                     .Returns(new IAppExecuter.ExecutionResult(0, "checkstyle issues", false));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(

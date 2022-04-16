@@ -30,7 +30,7 @@
       var file = directoryService.GetAllJavaFiles(masterFolder).Single();
 
       var checkstyleResult = checkstyleProcessor.Process(file);
-      if (checkstyleResult.ExitCode != 0)
+      if (checkstyleResult.ExitCode != 0 || !string.IsNullOrEmpty(checkstyleResult.CheckstyleOutput))
         output.WriteWarning("checkstyle issues");
       else
         output.WriteSuccess("checkstyle processed");
