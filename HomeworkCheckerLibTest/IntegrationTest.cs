@@ -46,6 +46,8 @@ namespace HomeworkCheckerLibTest
 
       appExecuterMock.Verify(x => x.Execute("javac", "arbitraryFolder", "-Xlint \"someFile.java\""), Times.Once());
       outputMock.Verify(o => o.WriteSuccess("compiled someFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing arbitraryFolder"));
+
 
       result.Outputs.Should().Equal(new List<HomeworkChecker.Output> 
       { 

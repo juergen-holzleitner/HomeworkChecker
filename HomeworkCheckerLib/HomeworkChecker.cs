@@ -24,6 +24,8 @@
 
     public MasterResult ProcessMaster(string masterFolder)
     {
+      output.WriteInfo($"processing {masterFolder}");
+
       var file = directoryService.GetAllJavaFiles(masterFolder).Single();
 
       var compileResult = javaCompiler.CompileFile(file);

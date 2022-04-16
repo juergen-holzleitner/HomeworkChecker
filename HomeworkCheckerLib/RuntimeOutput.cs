@@ -11,6 +11,11 @@
       WriteColoredOutput(message, ConsoleColor.Green);
     }
 
+    public void WriteInfo(string message)
+    {
+      Console.WriteLine(message);
+    }
+
     private static void WriteColoredOutput(string message, ConsoleColor color)
     {
       var currentColor = Console.ForegroundColor;
