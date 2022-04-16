@@ -17,7 +17,7 @@ namespace HomeworkCheckerLibTest
       var sut = new JavaCompiler(appExecuterMock.Object);
 
       var result = sut.CompileFile(@"someFolder\someFileName.java");
-      appExecuterMock.Verify(x => x.Execute("javac", "someFolder", "-Xlint \"someFileName.java\""), Times.Once());
+      appExecuterMock.Verify(x => x.Execute("javac", "someFolder", "-Xlint -encoding UTF8 \"someFileName.java\""), Times.Once());
     }
 
     [Fact]
