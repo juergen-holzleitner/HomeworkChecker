@@ -8,6 +8,8 @@
 
     public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
+    public record HomeworkResult(MasterResult MasterResult);
+
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
     {
@@ -87,6 +89,12 @@
       }
 
       return new(javaFile, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput, customAnalysisResult.CustomAnalysisOutput);
+    }
+
+    public HomeworkResult ProcessHomework(string masterFolder, string homeworkFolder)
+    {
+      var masterResult = ProcessMaster(masterFolder);
+      return new(masterResult);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)

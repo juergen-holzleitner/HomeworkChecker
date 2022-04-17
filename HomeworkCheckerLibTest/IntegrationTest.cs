@@ -15,7 +15,7 @@ namespace HomeworkCheckerLibTest
       const string masterFolder = @"arbitraryFolder";
 
       var appExecuterMock = new Mock<IAppExecuter>();
-      appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+      appExecuterMock.Setup(x => x.Execute("javac", It.IsAny<string>(), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", masterFolder, "someFile", "1\n2\n3\n", 5000))
                      .Returns(new IAppExecuter.ExecutionResult(0, "1", false));
@@ -76,29 +76,31 @@ namespace HomeworkCheckerLibTest
     }
 
     [Fact]
-    public void Print_error_if_compilation_failed()
+    public void Can_process_homework_folder()
     {
-      var appExecuterMock = new Mock<IAppExecuter>();
-      appExecuterMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(-1, string.Empty, false));
-      appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
-
-      var outputMock = new Mock<IRuntimeOutput>();
-      const string masterFolder = @"arbitraryFolder";
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
-        f => f.GetFilesInFolderRecursivly(masterFolder, "*.java"))
-              .Returns(new List<string> { @$"{masterFolder}\someFile.java" });
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{masterFolder}\someFile.java")).Returns(string.Empty);
+        f => f.GetFilesInFolderRecursivly("masterFolder", "*.java"))
+        .Returns(new List<string> { @$"masterFolder\masterFile.java" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"masterFolder\masterFile.java")).Returns("master source");
 
+      var appExecuterMock = new Mock<IAppExecuter>();
+      appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
+      appExecuterMock.Setup(x => x.Execute("javac", It.IsAny<string>(), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      appExecuterMock.Setup(x => x.Execute("java", "masterFolder", It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, "master output", false));
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      appExecuterMock.Setup(x => x.Execute("cmd.exe", Path.Combine("currentFolder", "pmd", "bin"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+
+      var outputMock = new Mock<IRuntimeOutput>();
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
-      var result = sut.ProcessMaster("arbitraryFolder");
-
-      outputMock.Verify(o => o.WriteError("compiling someFile.java failed"), Times.Once());
-      result.Outputs.Should().BeEmpty();
-
-      appExecuterMock.Verify(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()), Times.Never());
+      var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
 
     }
   }
