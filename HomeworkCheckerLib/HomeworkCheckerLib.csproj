@@ -13,6 +13,9 @@
     <None Update="checkstyle\google_checks_modified.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="jplag\jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -15,6 +15,10 @@
       {
         homeworkChecker.ProcessMaster(args[0]);
       }
+      else
+      {
+        homeworkChecker.ProcessHomework(args[0], args[1]);
+      }
     }
   }
 }
