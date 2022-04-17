@@ -16,10 +16,10 @@
 
       var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-Xlint -encoding UTF8 \"{javaFile}\"");
 
-      return new(executeResult.ExitCode == 0, javaFile, executeResult.Output);
+      return new(executeResult.ExitCode == 0, executeResult.Output);
     }
 
-    internal record CompileResult(bool CompileSucceeded, string JavaFile, string CompileOutput);
+    internal record CompileResult(bool CompileSucceeded, string CompileOutput);
 
   }
 }

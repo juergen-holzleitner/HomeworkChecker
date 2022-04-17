@@ -44,8 +44,8 @@ namespace HomeworkCheckerLibTest
 
       var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
       var outputSequence = new MockSequence();
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing arbitraryFolder"));
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing arbitraryFolder\\someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled arbitraryFolder\\someFile.java"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("custom analysis issues"));
@@ -83,9 +83,10 @@ namespace HomeworkCheckerLibTest
         f => f.GetFilesInFolderRecursivly("masterFolder", "*.java"))
         .Returns(new List<string> { @$"masterFolder\masterFile.java" });
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"masterFolder\masterFile.java")).Returns("master source");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(It.Is<string>(s => s.StartsWith("homeworkFolder")))).Returns("homework source");
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("homeworkFolder", "*.java"))
-        .Returns(new List<string> { @$"homeworkFolder\homeworkFile.java", @$"homeworkFolder\homeworkFile2.java" });
+        .Returns(new List<string> { @$"homeworkFolder\homeworkFile.java", @$"homeworkFolder2\homeworkFile.java" });
 
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
@@ -93,6 +94,8 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", "masterFolder", It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "master output", false));
+      appExecuterMock.Setup(x => x.Execute("java", It.Is<string>(s => s.StartsWith("homeworkFolder")), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, "homework output", false));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("cmd.exe", Path.Combine("currentFolder", "pmd", "bin"), It.IsAny<string>()))
@@ -108,6 +111,8 @@ namespace HomeworkCheckerLibTest
       var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
 
       outputMock.Verify(o => o.WriteWarning("processed jplag with 1 result(s), but 3 were expected"));
+      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder\\homeworkFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder2\\homeworkFile.java"));
 
       result.JplagResult.Similarities.Should().HaveCount(1);
 

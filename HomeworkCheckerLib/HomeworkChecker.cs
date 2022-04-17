@@ -6,9 +6,9 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
+    public record FileAnalysisResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record HomeworkResult(MasterResult MasterResult, JplagProcessor.JplagResult JplagResult);
+    public record HomeworkResult(FileAnalysisResult MasterResult, JplagProcessor.JplagResult JplagResult);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -29,11 +29,15 @@
       jplagProcessor = new JplagProcessor(appExecuter, fileEnumerator);
     }
 
-    public MasterResult ProcessMaster(string masterFolder)
+    public FileAnalysisResult ProcessMaster(string masterFolder)
     {
-      output.WriteInfo($"processing {masterFolder}");
-
       var javaFile = filesystemService.GetAllJavaFiles(masterFolder).Single();
+      return ProcessFileAnalysis(javaFile);
+    }
+
+    private FileAnalysisResult ProcessFileAnalysis(string javaFile)
+    {
+      output.WriteInfo($"processing {javaFile}");
 
       var compileOutput = string.Empty;
       IEnumerable<Output> outputs = Enumerable.Empty<Output>();
@@ -41,14 +45,14 @@
       var compileResult = javaCompiler.CompileFile(javaFile);
       if (!compileResult.CompileSucceeded)
       {
-        output.WriteError($"compiling {compileResult.JavaFile} failed");
+        output.WriteError($"compiling {javaFile} failed");
         compileOutput = compileResult.CompileOutput;
       }
       else
       {
-        output.WriteSuccess($"compiled {compileResult.JavaFile}");
+        output.WriteSuccess($"compiled {javaFile}");
 
-        outputs = GetProgramOutputs(compileResult.JavaFile, masterFolder);
+        outputs = GetProgramOutputs(javaFile);
         foreach (var programOutput in outputs)
         {
           if (programOutput.HasTimedOut)
@@ -108,28 +112,34 @@
       else
         output.WriteSuccess($"processed jplag with {numResults} result(s)");
 
+      foreach (var homeworkFile in homeworkFiles)
+      {
+        ProcessFileAnalysis(homeworkFile);
+      }
+
       return new(masterResult, jplagResult);
     }
 
-    internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
+    internal IEnumerable<Output> GetProgramOutputs(string fileName)
     {
+      var folder = Path.GetDirectoryName(fileName)!;
       var inputData = inputGenerator.GetInputs(folder);
-      return GetProgramOutputs(fileName, folder, inputData);
+      return GetProgramOutputs(fileName, inputData);
     }
 
-    internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder, InputGenerator.InputData inputData)
+    internal IEnumerable<Output> GetProgramOutputs(string fileName, InputGenerator.InputData inputData)
     {
       if (inputData.Inputs.Any())
       {
         foreach (var input in inputData.Inputs)
         {
-          var output = outputGenerator.GenerateOutput(fileName, folder, input.FileContent);
+          var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
           yield return new Output(input, output.Content, output.HasTimedOut);
         }
       }
       else
       {
-        var output = outputGenerator.GenerateOutput(fileName, folder, null);
+        var output = outputGenerator.GenerateOutput(fileName, null);
         yield return new Output(new("<no input>", string.Empty), output.Content, output.HasTimedOut);
       }
     }

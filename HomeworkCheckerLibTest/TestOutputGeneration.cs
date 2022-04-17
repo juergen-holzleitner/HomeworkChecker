@@ -2,6 +2,7 @@
 using HomeworkCheckerLib;
 using Moq;
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -16,7 +17,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, "output content", false));
       var sut = new OutputGenerator(appExecuterMock.Object);
 
-      var output = sut.GenerateOutput("fileName.java", "workingDir", "inputContent");
+      var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
       output.Should().Be(new OutputGenerator.Output("output content", false));
     }
@@ -29,7 +30,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, "output content", true));
       var sut = new OutputGenerator(appExecuterMock.Object);
 
-      var output = sut.GenerateOutput("fileName.java", "workingDir", "inputContent");
+      var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
       output.Should().Be(new OutputGenerator.Output("output content", true));
     }
@@ -42,7 +43,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, "output content", false));
       var sut = new OutputGenerator(appExecuterMock.Object);
 
-      var output = sut.GenerateOutput("fileName.java", "workingDir");
+      var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"));
 
       output.Should().Be(new OutputGenerator.Output("output content", false));
     }
@@ -56,7 +57,7 @@ namespace HomeworkCheckerLibTest
       var sut = new HomeworkChecker(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
       InputGenerator.InputData emptyInputData = new(new List<HomeworkChecker.Input>());
 
-      var outputs = sut.GetProgramOutputs("program.java", "masterfolder", emptyInputData);
+      var outputs = sut.GetProgramOutputs(Path.Combine("masterfolder", "program.java"), emptyInputData);
 
       outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new("<no input>", string.Empty), "output", false) });
 
