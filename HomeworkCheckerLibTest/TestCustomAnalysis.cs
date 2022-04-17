@@ -2,10 +2,7 @@
 using HomeworkCheckerLib;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -37,9 +34,9 @@ namespace HomeworkCheckerLibTest
     public void Can_detect_custom_errors(string codeLine, int lineNumber, string expectedError)
     {
       var sb = new StringBuilder();
-     
+
       CustomAnalysisProcessor.AnalyzeLine(lineNumber, codeLine, sb);
-      
+
       sb.ToString().Should().Be(expectedError + Environment.NewLine);
     }
   }

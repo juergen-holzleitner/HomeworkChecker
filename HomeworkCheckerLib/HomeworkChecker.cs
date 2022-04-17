@@ -8,7 +8,7 @@
 
     public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record HomeworkResult(MasterResult MasterResult, string JplagResult);
+    public record HomeworkResult(MasterResult MasterResult, JplagProcessor.JplagResult JplagResult);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -97,8 +97,8 @@
       var masterResult = ProcessMaster(masterFolder);
 
       var jplagResult = jplagProcessor.Process(masterFolder, homeworkFolder);
-      
-      return new(masterResult, jplagResult.JplagOutput);
+
+      return new(masterResult, jplagResult);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)

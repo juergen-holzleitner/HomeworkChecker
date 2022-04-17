@@ -1,12 +1,9 @@
 ﻿using FluentAssertions;
 using HomeworkCheckerLib;
 using Moq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -25,7 +22,7 @@ namespace HomeworkCheckerLibTest
 
       var result = sut.Process("masterFolder", "homeworkFolder");
 
-      result.Should().Be(new JplagProcessor.JplagResult("jplag result"));
+      result.Similarities.Should().BeEmpty();
     }
 
     [Fact]
@@ -43,6 +40,16 @@ namespace HomeworkCheckerLibTest
       sut.Process("masterFolder", "homeworkFolder");
 
       fileSystemMock.Verify(f => f.RemoveFolderIfExists(Path.Combine("currentFolder", "jplag", "TEMP-jplag-result")));
+    }
+
+    [Fact]
+    public void Can_get_jplag_similarities()
+    {
+      var jplagOutput = "Comparing \"fileA\" - \"fileB\": 50.23";
+
+      var result = JplagProcessor.GetSimilarities(jplagOutput);
+
+      result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileA", "fileB", 50.23) });
     }
   }
 }

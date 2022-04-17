@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace HomeworkCheckerLib
 {
-  internal class JplagProcessor
+  public class JplagProcessor
   {
     private readonly IAppExecuter appExecuter;
     private readonly FilesystemService.IFileEnumerator filesystemService;
 
-    public record JplagResult(string JplagOutput);
+    public record JplagResult(IEnumerable<JplagSimilarity> Similarities);
 
-    public JplagProcessor(IAppExecuter appExecuter, FilesystemService.IFileEnumerator filesystemService)
+    internal JplagProcessor(IAppExecuter appExecuter, FilesystemService.IFileEnumerator filesystemService)
     {
       this.appExecuter = appExecuter;
       this.filesystemService = filesystemService;
@@ -31,7 +27,26 @@ namespace HomeworkCheckerLib
       Trace.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
 
       filesystemService.RemoveFolderIfExists(Path.Combine(workingFolder, jplagResultFolder));
-      return new(result.Output);
+
+      var similarities = GetSimilarities(result.Output);
+
+      return new(similarities);
+    }
+
+    public record JplagSimilarity(string FileA, string FileB, double Similarity);
+
+    internal static IEnumerable<JplagSimilarity> GetSimilarities(string jplagOutput)
+    {
+      var regex = new Regex(@"Comparing ""(?<fileA>.+)"" - ""(?<fileB>.+)"": (?<result>.+)");
+      var matches = regex.Matches(jplagOutput);
+      foreach (Match match in matches)
+      {
+        var fileA = match.Groups["fileA"].Value;
+        var fileB = match.Groups["fileB"].Value;
+        var result = match.Groups["result"].Value;
+        var similarity = double.Parse(result);
+        yield return new JplagSimilarity(fileA, fileB, similarity);
+      }
     }
   }
 }

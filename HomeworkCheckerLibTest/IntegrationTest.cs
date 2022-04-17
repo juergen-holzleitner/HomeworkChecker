@@ -104,7 +104,7 @@ namespace HomeworkCheckerLibTest
 
       var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
 
-      result.JplagResult.Should().BeEmpty();
+      result.JplagResult.Similarities.Should().BeEmpty();
 
     }
   }
