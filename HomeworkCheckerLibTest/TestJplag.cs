@@ -25,7 +25,7 @@ namespace HomeworkCheckerLibTest
 
       var result = sut.Process("masterFolder", "homeworkFolder");
 
-      result.Should().Be(new JplagProcessor.JplagResult(0, "jplag result"));
+      result.Should().Be(new JplagProcessor.JplagResult("jplag result"));
     }
   }
 }

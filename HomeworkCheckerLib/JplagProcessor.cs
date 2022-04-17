@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace HomeworkCheckerLib
   {
     private readonly IAppExecuter appExecuter;
 
-    public record JplagResult(int ExitCode, string JplagOutput);
+    public record JplagResult(string JplagOutput);
 
     public JplagProcessor(IAppExecuter appExecuter)
     {
@@ -24,7 +25,9 @@ namespace HomeworkCheckerLib
       var currentFolder = appExecuter.GetCurrentFolder();
       var result = appExecuter.Execute("java", Path.Combine(currentFolder, "jplag"), $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{masterFolder}\" \"{homeworkFolder}\"");
 
-      return new(result.ExitCode, result.Output);
+      Trace.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
+
+      return new(result.Output);
     }
   }
 }

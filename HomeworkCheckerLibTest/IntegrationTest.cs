@@ -27,7 +27,7 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Setup(x => x.Execute("cmd.exe", Path.Combine("currentFolder", "pmd", "bin"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "PMD content", true));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(-1, "SpotBugs content", true));
+                     .Returns(new IAppExecuter.ExecutionResult(0, "SpotBugs content", true));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
@@ -51,7 +51,7 @@ namespace HomeworkCheckerLibTest
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("custom analysis issues"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("checkstyle issues"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("PMD issues"));
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteError("SpotBugs failed"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("SpotBugs issues"));
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
