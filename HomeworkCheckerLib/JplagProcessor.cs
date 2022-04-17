@@ -48,5 +48,10 @@ namespace HomeworkCheckerLib
         yield return new JplagSimilarity(fileA, fileB, similarity);
       }
     }
+
+    internal static int GetExpectedNumberOfSimilarities(int numberOfFiles)
+    {
+      return numberOfFiles * (numberOfFiles - 1) /2;
+    }
   }
 }

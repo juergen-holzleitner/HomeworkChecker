@@ -96,7 +96,17 @@
     {
       var masterResult = ProcessMaster(masterFolder);
 
+      var homeworkFiles = filesystemService.GetAllJavaFiles(homeworkFolder);
+
       var jplagResult = jplagProcessor.Process(masterFolder, homeworkFolder);
+      var numResults = jplagResult.Similarities.Count();
+      const int numberOfMasterFiles = 1;
+      int numberOfHomeworkFiles = homeworkFiles.Count();
+      var numResultsExpected = JplagProcessor.GetExpectedNumberOfSimilarities(numberOfHomeworkFiles + numberOfMasterFiles);
+      if (numResults != numResultsExpected)
+        output.WriteWarning($"processed jplag with {numResults} result(s), but {numResultsExpected} were expected");
+      else
+        output.WriteSuccess($"processed jplag with {numResults} result(s)");
 
       return new(masterResult, jplagResult);
     }

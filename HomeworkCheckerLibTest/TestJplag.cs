@@ -51,5 +51,16 @@ namespace HomeworkCheckerLibTest
 
       result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileA", "fileB", 50.23) });
     }
+
+    [Theory]
+    [InlineData(3, 3)]
+    [InlineData(2, 1)]
+    [InlineData(4, 6)]
+    public void Can_get_num_expected_similarities(int numberOfFiles, int expectedNumberOfSimilarities)
+    {
+      var numberOfSimilarities = JplagProcessor.GetExpectedNumberOfSimilarities(numberOfFiles);
+      
+      numberOfSimilarities.Should().Be(expectedNumberOfSimilarities);
+    }
   }
 }
