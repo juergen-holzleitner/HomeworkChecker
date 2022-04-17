@@ -11,5 +11,11 @@
     {
       return File.ReadAllText(filePath);
     }
+
+    public void RemoveFolderIfExists(string folder)
+    {
+      if (Directory.Exists(folder))
+        Directory.Delete(folder, true);
+    }
   }
 }

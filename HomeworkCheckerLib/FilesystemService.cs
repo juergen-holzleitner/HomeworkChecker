@@ -6,6 +6,7 @@
     {
       IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension);
       string ReadFileContent(string filePath);
+      void RemoveFolderIfExists(string folder);
     }
 
     readonly IFileEnumerator fileEnumerator;

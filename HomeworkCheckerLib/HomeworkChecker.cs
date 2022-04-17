@@ -26,7 +26,7 @@
       pmdProcessor = new PMDProcessor(appExecuter);
       spotBugsProcessor = new SpotBugsProcessor(appExecuter);
       customAnalysisProcessor = new CustomAnalysisProcessor(filesystemService);
-      jplagProcessor = new JplagProcessor(appExecuter);
+      jplagProcessor = new JplagProcessor(appExecuter, fileEnumerator);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
