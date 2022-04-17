@@ -96,11 +96,15 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
+                     .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
 
       var outputMock = new Mock<IRuntimeOutput>();
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
       var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
+
+      result.JplagResult.Should().BeEmpty();
 
     }
   }

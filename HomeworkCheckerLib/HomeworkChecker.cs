@@ -8,7 +8,7 @@
 
     public record MasterResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record HomeworkResult(MasterResult MasterResult);
+    public record HomeworkResult(MasterResult MasterResult, string JplagResult);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -26,6 +26,7 @@
       pmdProcessor = new PMDProcessor(appExecuter);
       spotBugsProcessor = new SpotBugsProcessor(appExecuter);
       customAnalysisProcessor = new CustomAnalysisProcessor(filesystemService);
+      jplagProcessor = new JplagProcessor(appExecuter);
     }
 
     public MasterResult ProcessMaster(string masterFolder)
@@ -94,7 +95,10 @@
     public HomeworkResult ProcessHomework(string masterFolder, string homeworkFolder)
     {
       var masterResult = ProcessMaster(masterFolder);
-      return new(masterResult);
+
+      var jplagResult = jplagProcessor.Process(masterFolder, homeworkFolder);
+      
+      return new(masterResult, jplagResult.JplagOutput);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, string folder)
@@ -129,5 +133,6 @@
     readonly CheckstyleProcessor checkstyleProcessor;
     readonly PMDProcessor pmdProcessor;
     readonly SpotBugsProcessor spotBugsProcessor;
+    readonly JplagProcessor jplagProcessor;
   }
 }
