@@ -15,12 +15,16 @@
       {
         var analysisResult = homeworkChecker.ProcessMaster(args[0]);
         homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
+        if (homeworkChecker.StartVSCodeWithFolder(args[0]) == 0)
+          homeworkChecker.CleanUpMarkdownFiles(analysisResult);
       }
       else
       {
         var analysisResult = homeworkChecker.ProcessHomework(args[0], args[1]);
-        foreach (var analysis in analysisResult.Submissions)
-          homeworkChecker.WriteAnalysisToMarkdownFile(analysis);
+        homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
+
+        if (homeworkChecker.StartVSCodeWithFolder(args[1]) == 0)
+          homeworkChecker.CleanUpMarkdownFiles(analysisResult);
       }
     }
   }

@@ -25,6 +25,7 @@
     {
       filesystemService = new FilesystemService(fileEnumerator);
       javaCompiler = new JavaCompiler(appExecuter);
+      this.appExecuter = appExecuter;
       this.output = output;
       inputGenerator = new InputGenerator(filesystemService);
       outputGenerator = new OutputGenerator(appExecuter);
@@ -175,11 +176,46 @@
       var markdownText = MarkdownGenerator.FromFileAnalysis(analysisResult);
       filesystemService.AppendMarkdown(markdownFile, markdownText);
     }
-    public void WriteAnalysisToMarkdownFile(SubmissionAnalysis analysisResult)
+
+    public void WriteAnalysisToMarkdownFile(HomeworkResult analysisResult)
     {
-      var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.AnalysisResult.FileName)!, "NOTES.md");
-      var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysisResult);
-      filesystemService.AppendMarkdown(markdownFile, markdownText);
+      foreach (var analysis in analysisResult.Submissions)
+      {
+        var markdownFile = Path.Combine(Path.GetDirectoryName(analysis.AnalysisResult.FileName)!, "NOTES.md");
+        var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysis);
+        filesystemService.AppendMarkdown(markdownFile, markdownText);
+      }
+    }
+
+    public int StartVSCodeWithFolder(string folder)
+    {
+      output.WriteInfo(Environment.NewLine);
+      output.WriteInfo("waiting for VS code to close ...");
+
+      var result = appExecuter.Execute("cmd.exe", folder, "/c code.cmd --wait .");
+      return result.ExitCode;
+    }
+
+    public void CleanUpMarkdownFiles(FileAnalysisResult fileAnalysisResult)
+    {
+      RemoveMarkdownFile(fileAnalysisResult);
+      output.WriteInfo("NOTES.md cleared");
+    }
+
+    private void RemoveMarkdownFile(FileAnalysisResult fileAnalysisResult)
+    {
+      var path = Path.GetDirectoryName(fileAnalysisResult.FileName)!;
+      filesystemService.RemoveFileIfExists(Path.Combine(path, "NOTES.md"));
+    }
+
+    public void CleanUpMarkdownFiles(HomeworkResult homeworkResult)
+    {
+      foreach (var submission in homeworkResult.Submissions)
+      {
+        var path = Path.GetDirectoryName(submission.AnalysisResult.FileName)!;
+        filesystemService.RemoveFileIfExists(Path.Combine(path, "NOTES.md"));
+      }
+      output.WriteInfo("NOTES.md cleared");
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, InputGenerator.InputData inputData)
@@ -201,6 +237,7 @@
 
     readonly FilesystemService filesystemService;
     readonly JavaCompiler javaCompiler;
+    private readonly IAppExecuter appExecuter;
     readonly IRuntimeOutput output;
     readonly InputGenerator inputGenerator;
     readonly OutputGenerator outputGenerator;

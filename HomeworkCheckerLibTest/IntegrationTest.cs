@@ -128,6 +128,33 @@ namespace HomeworkCheckerLibTest
       homework1Submission.FileNameAnalysis.FileNameDifference.Diffs.Should().HaveCount(3);
 
       homework1Submission.OutputDifference.Differences.Single().DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.Different);
+    }
+
+    [Fact]
+    public void Can_start_vscode_with_folder()
+    {
+      var appExecuterMock = new Mock<IAppExecuter>();
+      var outputMock = new Mock<IRuntimeOutput>();
+      var sut = new HomeworkChecker(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object, outputMock.Object);
+
+      appExecuterMock.Setup(x => x.Execute("cmd.exe", "folder", "/c code.cmd --wait .")).Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
+      int exitCode = sut.StartVSCodeWithFolder("folder");
+
+      exitCode.Should().Be(0);
+      outputMock.Verify(o => o.WriteInfo("waiting for VS code to close ..."));
+    }
+
+    [Fact]
+    public void Can_cleanup_markdown_file()
+    {
+      var outputMock = new Mock<IRuntimeOutput>();
+      var filesystemMock = new Mock<FilesystemService.IFileEnumerator>();
+      var sut = new HomeworkChecker(filesystemMock.Object, Mock.Of<IAppExecuter>(), outputMock.Object);
+      var fileAnalysisResult = new HomeworkChecker.FileAnalysisResult("someFolder\\someFile.java", string.Empty, Enumerable.Empty<HomeworkChecker.Output>(), string.Empty, string.Empty, string.Empty, string.Empty);
+
+      sut.CleanUpMarkdownFiles(fileAnalysisResult);
+
+      filesystemMock.Verify(f => f.RemoveFileIfExists("someFolder\\NOTES.md"));
 
     }
   }

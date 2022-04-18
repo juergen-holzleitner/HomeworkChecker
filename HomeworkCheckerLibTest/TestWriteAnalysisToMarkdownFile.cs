@@ -75,9 +75,10 @@ compile error
       var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
       var submissionAnalysis = new HomeworkChecker.SubmissionAnalysis(similarities, fileNameAnalysis, outputDifference, analysisResult);
+      var homeworkResult = new HomeworkChecker.HomeworkResult(analysisResult, new List<HomeworkChecker.SubmissionAnalysis> { submissionAnalysis });
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());
 
-      sut.WriteAnalysisToMarkdownFile(submissionAnalysis);
+      sut.WriteAnalysisToMarkdownFile(homeworkResult);
 
       System.Linq.Expressions.Expression<Func<string, bool>> verifyAllPartsIncluded = s =>
         s.Contains("<<<compile>>>")
