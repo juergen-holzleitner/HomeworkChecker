@@ -14,7 +14,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
-      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), "-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"TEMP-jplag-result\" \"masterFolder\" \"homeworkFolder\""))
+      appExecuterMock.Setup(x => x.ExecuteAsciiOutput("java", Path.Combine("currentFolder", "jplag"), "-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"TEMP-jplag-result\" \"masterFolder\" \"homeworkFolder\""))
         .Returns(new IAppExecuter.ExecutionResult(0, "jplag result", false));
 
       var sut = new JplagProcessor(appExecuterMock.Object, Mock.Of<FilesystemService.IFileEnumerator>());
@@ -29,7 +29,7 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
-      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), "-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"TEMP-jplag-result\" \"masterFolder\" \"homeworkFolder\""))
+      appExecuterMock.Setup(x => x.ExecuteAsciiOutput("java", Path.Combine("currentFolder", "jplag"), "-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"TEMP-jplag-result\" \"masterFolder\" \"homeworkFolder\""))
         .Returns(new IAppExecuter.ExecutionResult(0, "jplag result", false));
 
       var fileSystemMock = new Mock<FilesystemService.IFileEnumerator>();
@@ -44,11 +44,11 @@ namespace HomeworkCheckerLibTest
     [Fact]
     public void Can_get_jplag_similarities()
     {
-      var jplagOutput = "Comparing \"fileA\" - \"fileB\": 50.23";
+      var jplagOutput = "Comparing \"file³\" - \"fileB\": 50.23";
 
       var result = JplagProcessor.GetSimilarities(jplagOutput);
 
-      result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileA", "fileB", 50.23) });
+      result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileü", "fileB", 50.23) });
     }
 
     [Theory]

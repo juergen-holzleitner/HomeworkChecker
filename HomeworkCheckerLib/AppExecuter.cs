@@ -5,7 +5,7 @@ namespace HomeworkCheckerLib
 {
   internal class AppExecuter : IAppExecuter
   {
-    public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input, int? timeout)
+    private static IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input, int? timeout, bool useAsciiEncoding)
     {
       using var process = new Process();
       process.StartInfo.FileName = appName;
@@ -13,7 +13,8 @@ namespace HomeworkCheckerLib
       process.StartInfo.Arguments = arguments;
 
       process.StartInfo.RedirectStandardOutput = true;
-      process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+      if (!useAsciiEncoding)
+        process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
       var output = new StringBuilder();
 
       process.OutputDataReceived += (sender, args) =>
@@ -23,7 +24,8 @@ namespace HomeworkCheckerLib
       };
 
       process.StartInfo.RedirectStandardError = true;
-      process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+      if (!useAsciiEncoding)
+        process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
       process.ErrorDataReceived += (sender, args) =>
       {
         if (args.Data is not null)
@@ -55,9 +57,19 @@ namespace HomeworkCheckerLib
       return new(process.ExitCode, output.ToString(), false);
     }
 
+    public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments, string? input, int? timeout)
+    {
+      return Execute(appName, workingDirectory, arguments, input, timeout, false);
+    }
+
     public IAppExecuter.ExecutionResult Execute(string appName, string workingDirectory, string arguments)
     {
       return Execute(appName, workingDirectory, arguments, null, null);
+    }
+
+    public IAppExecuter.ExecutionResult ExecuteAsciiOutput(string appName, string workingDirectory, string arguments)
+    {
+      return Execute(appName, workingDirectory, arguments, null, null, true);
     }
 
     public string GetCurrentFolder() => Directory.GetCurrentDirectory();

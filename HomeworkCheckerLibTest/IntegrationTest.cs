@@ -105,7 +105,7 @@ namespace HomeworkCheckerLibTest
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
-      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
+      appExecuterMock.Setup(x => x.ExecuteAsciiOutput("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75\r\nComparing \"homeworkFolder2\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
 
       var outputMock = new Mock<IRuntimeOutput>();
@@ -117,7 +117,7 @@ namespace HomeworkCheckerLibTest
       outputMock.Verify(o => o.WriteWarning("processed jplag with 2 result(s), but 3 were expected"));
       outputMock.Verify(o => o.WriteInfo("processing homeworkFile.java"));
       outputMock.Verify(o => o.WriteInfo("processing HomeworkFile.java"));
-      outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
+      outputMock.Verify(o => o.WriteWarning("homeworkFile.java has 1 duplicate(s)"));
 
       result.Submissions.Should().HaveCount(2);
       var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileName == "homeworkFolder\\homeworkFile.java").Single();

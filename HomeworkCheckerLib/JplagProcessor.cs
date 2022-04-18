@@ -22,7 +22,7 @@ namespace HomeworkCheckerLib
 
       var currentFolder = appExecuter.GetCurrentFolder();
       var workingFolder = Path.Combine(currentFolder, "jplag");
-      var result = appExecuter.Execute("java", workingFolder, $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{masterFolder}\" \"{homeworkFolder}\"");
+      var result = appExecuter.ExecuteAsciiOutput("java", workingFolder, $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{masterFolder}\" \"{homeworkFolder}\"");
 
       Trace.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
 
@@ -33,10 +33,21 @@ namespace HomeworkCheckerLib
       return new(similarities);
     }
 
+    private static string RevertInvalidJavaOutputEncoding(string javaOutput)
+    {
+      javaOutput = javaOutput.Replace("÷", "ö");
+      javaOutput = javaOutput.Replace("³", "ü");
+      javaOutput = javaOutput.Replace("Í", "Ö");
+
+      return javaOutput;
+    }
+
     public record JplagSimilarity(string FileA, string FileB, double Similarity);
 
     internal static IEnumerable<JplagSimilarity> GetSimilarities(string jplagOutput)
     {
+      jplagOutput = RevertInvalidJavaOutputEncoding(jplagOutput);
+
       var regex = new Regex(@"Comparing ""(?<fileA>.+)"" - ""(?<fileB>.+)"": (?<result>.+)");
       var matches = regex.Matches(jplagOutput);
       foreach (Match match in matches)

@@ -151,12 +151,12 @@
         var masterSimilarity = jplagSimilarities.Where(j => j.File == masterResult.FileName).SingleOrDefault();
         var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities.Where(j => j.File != masterResult.FileName), masterSimilarity);
         if (duplicateInfo.Any())
-          output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
+          output.WriteWarning($"{outputName} has {duplicateInfo.Count()} duplicate(s)");
 
         string homeworkFileName = Path.GetFileName(homeworkFile);
         var fileNameDifferences = TextDiffGenerator.GenerateDiff(masterFileName, homeworkFileName);
         if (fileNameDifferences.Diffs.Any())
-          output.WriteWarning($"{homeworkFile} has filename differences");
+          output.WriteWarning($"{outputName} has filename differences");
         var fileNameAnalysis = new FileNameAnalysis(masterFileName, homeworkFileName, fileNameDifferences);
 
         var outputAnalysis = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(Enumerable.Empty<OutputDifferencesAnalyzer.OutputDifference>());
