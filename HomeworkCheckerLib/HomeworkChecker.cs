@@ -8,7 +8,9 @@
 
     public record FileAnalysisResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record HomeworkResult(FileAnalysisResult MasterResult, JplagProcessor.JplagResult JplagResult);
+    public record SubmissionAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Similarities, FileAnalysisResult AnalysisResult);
+
+    public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions, JplagProcessor.JplagResult JplagResult);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -27,6 +29,7 @@
       spotBugsProcessor = new SpotBugsProcessor(appExecuter);
       customAnalysisProcessor = new CustomAnalysisProcessor(filesystemService);
       jplagProcessor = new JplagProcessor(appExecuter, fileEnumerator);
+      duplicateFileAnalyzer = new DuplicateFileAnalyzer(filesystemService);
     }
 
     public FileAnalysisResult ProcessMaster(string masterFolder)
@@ -112,12 +115,21 @@
       else
         output.WriteSuccess($"processed jplag with {numResults} result(s)");
 
+      List<SubmissionAnalysis> submissions = new();
       foreach (var homeworkFile in homeworkFiles)
       {
-        ProcessFileAnalysis(homeworkFile);
+        var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, homeworkFiles);
+        if (duplicateInfo.Any())
+          output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
+        else
+          output.WriteSuccess("no duplicates found");
+
+        var analysisResult = ProcessFileAnalysis(homeworkFile);
+
+        submissions.Add(new(duplicateInfo, analysisResult));
       }
 
-      return new(masterResult, jplagResult);
+      return new(masterResult, submissions, jplagResult);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName)
@@ -154,5 +166,6 @@
     readonly PMDProcessor pmdProcessor;
     readonly SpotBugsProcessor spotBugsProcessor;
     readonly JplagProcessor jplagProcessor;
+    readonly DuplicateFileAnalyzer duplicateFileAnalyzer;
   }
 }

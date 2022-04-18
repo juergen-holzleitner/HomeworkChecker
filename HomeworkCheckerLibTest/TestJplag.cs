@@ -3,7 +3,6 @@ using HomeworkCheckerLib;
 using Moq;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -59,7 +58,7 @@ namespace HomeworkCheckerLibTest
     public void Can_get_num_expected_similarities(int numberOfFiles, int expectedNumberOfSimilarities)
     {
       var numberOfSimilarities = JplagProcessor.GetExpectedNumberOfSimilarities(numberOfFiles);
-      
+
       numberOfSimilarities.Should().Be(expectedNumberOfSimilarities);
     }
   }

@@ -3,6 +3,7 @@ using HomeworkCheckerLib;
 using Moq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -113,7 +114,10 @@ namespace HomeworkCheckerLibTest
       outputMock.Verify(o => o.WriteWarning("processed jplag with 1 result(s), but 3 were expected"));
       outputMock.Verify(o => o.WriteInfo("processing homeworkFolder\\homeworkFile.java"));
       outputMock.Verify(o => o.WriteInfo("processing homeworkFolder2\\homeworkFile.java"));
+      outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
 
+      result.Submissions.Should().HaveCount(2);
+      result.Submissions.First().Similarities.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\homeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
       result.JplagResult.Similarities.Should().HaveCount(1);
 
     }

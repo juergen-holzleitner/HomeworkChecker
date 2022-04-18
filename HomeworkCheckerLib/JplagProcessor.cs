@@ -51,7 +51,7 @@ namespace HomeworkCheckerLib
 
     internal static int GetExpectedNumberOfSimilarities(int numberOfFiles)
     {
-      return numberOfFiles * (numberOfFiles - 1) /2;
+      return numberOfFiles * (numberOfFiles - 1) / 2;
     }
   }
 }
