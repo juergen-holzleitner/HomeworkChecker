@@ -59,7 +59,7 @@ namespace HomeworkCheckerLibTest
       var result = sut.ProcessMaster(masterFolder);
 
       var expectedMasterFile = Path.Combine(@"arbitraryFolder", @"someFile.java");
-      result.MasterFile.Should().Be(Path.Combine(expectedMasterFile));
+      result.FileName.Should().Be(Path.Combine(expectedMasterFile));
       result.CompileIssues.Should().BeEmpty();
 
       result.Outputs.Should().Equal(new List<HomeworkChecker.Output>
@@ -117,9 +117,8 @@ namespace HomeworkCheckerLibTest
       outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
 
       result.Submissions.Should().HaveCount(2);
-      result.Submissions.First().Similarities.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\homeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
-      result.JplagResult.Similarities.Should().HaveCount(1);
-
+      result.Submissions.First().Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\homeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
+      result.Submissions.First().Similarities.JplagSimilarities.Should().HaveCount(1);
     }
   }
 }

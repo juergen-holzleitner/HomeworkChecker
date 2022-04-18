@@ -61,5 +61,17 @@ namespace HomeworkCheckerLibTest
 
       numberOfSimilarities.Should().Be(expectedNumberOfSimilarities);
     }
+
+    [Fact]
+    public void Can_get_submission_similarities()
+    {
+      var similarities = new List<JplagProcessor.JplagSimilarity> { new("fileA", "fileB", 99.9) };
+
+      var result = JplagProcessor.GetSubmissionSimilarities("fileA", similarities);
+      result.Should().Equal(new List<JplagProcessor.SubmissionSimilarity> { new("fileB", 99.9) });
+
+      result = JplagProcessor.GetSubmissionSimilarities("fileB", similarities);
+      result.Should().Equal(new List<JplagProcessor.SubmissionSimilarity> { new("fileA", 99.9) });
+    }
   }
 }

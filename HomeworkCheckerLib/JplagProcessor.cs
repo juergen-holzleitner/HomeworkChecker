@@ -53,5 +53,15 @@ namespace HomeworkCheckerLib
     {
       return numberOfFiles * (numberOfFiles - 1) / 2;
     }
+
+    public record SubmissionSimilarity(string File, double Similarity);
+
+    internal static IEnumerable<SubmissionSimilarity> GetSubmissionSimilarities(string submissionFile, IEnumerable<JplagSimilarity> similarities)
+    {
+      var resultA = from s in similarities where s.FileA == submissionFile select new SubmissionSimilarity(s.FileB, s.Similarity);
+      var resultB = from s in similarities where s.FileB == submissionFile select new SubmissionSimilarity(s.FileA, s.Similarity);
+
+      return Enumerable.Union(resultA, resultB);
+    }
   }
 }

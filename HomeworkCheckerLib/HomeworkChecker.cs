@@ -6,11 +6,13 @@
 
     public record Output(Input Input, string OutputContent, bool HasTimedOut);
 
-    public record FileAnalysisResult(string MasterFile, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
+    public record FileAnalysisResult(string FileName, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record SubmissionAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Similarities, FileAnalysisResult AnalysisResult);
+    public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities);
 
-    public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions, JplagProcessor.JplagResult JplagResult);
+    public record SubmissionAnalysis(SimilarityAnalysis Similarities, FileAnalysisResult AnalysisResult);
+
+    public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -115,21 +117,25 @@
       else
         output.WriteSuccess($"processed jplag with {numResults} result(s)");
 
+      var possibleDuplicateFiles = Enumerable.Append(homeworkFiles, masterResult.FileName);
+
       List<SubmissionAnalysis> submissions = new();
       foreach (var homeworkFile in homeworkFiles)
       {
-        var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, homeworkFiles);
+        var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, possibleDuplicateFiles);
         if (duplicateInfo.Any())
           output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
         else
           output.WriteSuccess("no duplicates found");
+        var jplagSimilarities = JplagProcessor.GetSubmissionSimilarities(homeworkFile, jplagResult.Similarities);
+        var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities);
 
         var analysisResult = ProcessFileAnalysis(homeworkFile);
 
-        submissions.Add(new(duplicateInfo, analysisResult));
+        submissions.Add(new(similarityAnalysis, analysisResult));
       }
 
-      return new(masterResult, submissions, jplagResult);
+      return new(masterResult, submissions);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName)
