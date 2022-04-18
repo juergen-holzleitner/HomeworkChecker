@@ -10,7 +10,7 @@
 
     public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities);
 
-    public record SubmissionAnalysis(SimilarityAnalysis Similarities, TextDiffGenerator.Difference FileNameDifference, FileAnalysisResult AnalysisResult);
+    public record SubmissionAnalysis(SimilarityAnalysis Similarities, TextDiffGenerator.Difference FileNameDifference, OutputDifferencesAnalyzer.OutputDifferenceAnalysis OutputDifference, FileAnalysisResult AnalysisResult);
 
     public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions);
 
@@ -143,7 +143,9 @@
 
         var analysisResult = ProcessFileAnalysis(homeworkFile, inputData);
 
-        submissions.Add(new(similarityAnalysis, fileNameDiffernces, analysisResult));
+        var outputAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterResult.Outputs, analysisResult.Outputs);
+
+        submissions.Add(new(similarityAnalysis, fileNameDiffernces, outputAnalysis, analysisResult));
       }
 
       return new(masterResult, submissions);

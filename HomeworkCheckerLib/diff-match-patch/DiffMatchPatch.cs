@@ -19,7 +19,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System;
 
 namespace DiffMatchPatch
 {

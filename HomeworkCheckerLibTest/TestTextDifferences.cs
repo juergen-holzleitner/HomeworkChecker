@@ -26,5 +26,15 @@ namespace HomeworkCheckerLibTest
 
       diff.Diffs.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Can_get_string_without_whitespaces()
+    {
+      var text = " Some Text ";
+
+      var withoutWhitespaces = TextDiffGenerator.GetStringWithoutWhiteSpaces(text);
+
+      withoutWhitespaces.Should().Be("SomeText");
+    }
   }
 }

@@ -15,5 +15,10 @@
 
       return new Difference(diffs);
     }
+
+    internal static string GetStringWithoutWhiteSpaces(string fileContent)
+    {
+      return string.Concat(fileContent.Where(c => !char.IsWhiteSpace(c)));
+    }
   }
 }
