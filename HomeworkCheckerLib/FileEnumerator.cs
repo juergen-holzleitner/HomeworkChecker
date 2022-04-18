@@ -23,5 +23,10 @@
       if (File.Exists(filePath))
         File.Delete(filePath);
     }
+
+    public void AppendAllText(string fileName, string markdown)
+    {
+      File.AppendAllText(fileName, markdown);
+    }
   }
 }

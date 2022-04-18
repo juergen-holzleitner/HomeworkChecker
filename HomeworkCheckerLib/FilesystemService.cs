@@ -8,6 +8,7 @@
       string ReadFileContent(string filePath);
       void RemoveFolderIfExists(string folder);
       void RemoveFileIfExists(string filePath);
+      void AppendAllText(string fileName, string markdown);
     }
 
     readonly IFileEnumerator fileEnumerator;
@@ -39,5 +40,13 @@
     }
 
     internal void RemoveFileIfExists(string folder) => fileEnumerator.RemoveFileIfExists(folder);
+
+    internal void AppendMarkdown(string fileName, string markdown)
+    {
+      if (string.IsNullOrEmpty(markdown))
+        return;
+
+      fileEnumerator.AppendAllText(fileName, markdown);
+    }
   }
 }

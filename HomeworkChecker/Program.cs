@@ -13,7 +13,8 @@
       var homeworkChecker = new HomeworkCheckerLib.HomeworkChecker();
       if (args.Length == 1)
       {
-        homeworkChecker.ProcessMaster(args[0]);
+        var analysisResult = homeworkChecker.ProcessMaster(args[0]);
+        homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
       }
       else
       {

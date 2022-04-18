@@ -163,6 +163,13 @@
       return new(masterResult, submissions);
     }
 
+    public void WriteAnalysisToMarkdownFile(FileAnalysisResult analysisResult)
+    {
+      var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.FileName)!, "NOTES.md");
+      var markdownText = MarkdownGenerator.FromFileAnalysis(analysisResult);
+      filesystemService.AppendMarkdown(markdownFile, markdownText);
+    }
+
     internal IEnumerable<Output> GetProgramOutputs(string fileName, InputGenerator.InputData inputData)
     {
       if (inputData.Inputs.Any())
