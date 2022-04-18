@@ -159,10 +159,14 @@
           output.WriteWarning($"{homeworkFile} has filename differences");
         var fileNameAnalysis = new FileNameAnalysis(masterFileName, homeworkFileName, fileNameDifferences);
 
-        var outputAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterResult.Outputs, analysisResult.Outputs);
-        var numDifferences = outputAnalysis.Differences.Count(d => d.DifferenceType != OutputDifferencesAnalyzer.DifferenceType.Equal);
-        if (numDifferences > 0)
-          output.WriteWarning($"{numDifferences} output(s) differ");
+        var outputAnalysis = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(Enumerable.Empty<OutputDifferencesAnalyzer.OutputDifference>());
+        if (string.IsNullOrEmpty(analysisResult.CompileIssues))
+        {
+          outputAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterResult.Outputs, analysisResult.Outputs);
+          var numDifferences = outputAnalysis.Differences.Count(d => d.DifferenceType != OutputDifferencesAnalyzer.DifferenceType.Equal);
+          if (numDifferences > 0)
+            output.WriteWarning($"{numDifferences} output(s) differ");
+        }
 
         submissions.Add(new(similarityAnalysis, fileNameAnalysis, outputAnalysis, analysisResult));
       }

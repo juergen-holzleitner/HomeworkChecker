@@ -84,12 +84,12 @@ namespace HomeworkCheckerLibTest
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("masterFolder", "*.java"))
-        .Returns(new List<string> { @$"masterFolder\HomeworkFile.java" });
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"masterFolder\HomeworkFile.java")).Returns("master source");
+        .Returns(new List<string> { @"masterFolder\HomeworkFile.java" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@"masterFolder\HomeworkFile.java")).Returns("master source");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(It.Is<string>(s => s.StartsWith("homeworkFolder")))).Returns("homework source");
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("homeworkFolder", "*.java"))
-        .Returns(new List<string> { @$"homeworkFolder\homeworkFile.java", @$"homeworkFolder2\HomeworkFile.java" });
+        .Returns(new List<string> { @"homeworkFolder\homeworkFile.java", @"homeworkFolder2\HomeworkFile.java" });
 
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
@@ -121,7 +121,7 @@ namespace HomeworkCheckerLibTest
 
       result.Submissions.Should().HaveCount(2);
       var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileName == "homeworkFolder\\homeworkFile.java").Single();
-      homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
+      homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
       homework1Submission.Similarities.JplagSimilarities.Should().HaveCount(1);
       homework1Submission.Similarities.JplagMasterSimilarity.Should().NotBeNull();
 
