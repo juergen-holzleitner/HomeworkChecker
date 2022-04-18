@@ -36,11 +36,18 @@
 
     public FileAnalysisResult ProcessMaster(string masterFolder)
     {
-      var javaFile = filesystemService.GetAllJavaFiles(masterFolder).Single();
-      return ProcessFileAnalysis(javaFile);
+      var inputData = inputGenerator.GetInputs(masterFolder);
+
+      return ProcessMaster(masterFolder, inputData);
     }
 
-    private FileAnalysisResult ProcessFileAnalysis(string javaFile)
+    private FileAnalysisResult ProcessMaster(string masterFolder, InputGenerator.InputData inputData)
+    {
+      var javaFile = filesystemService.GetAllJavaFiles(masterFolder).Single();
+      return ProcessFileAnalysis(javaFile, inputData);
+    }
+
+    private FileAnalysisResult ProcessFileAnalysis(string javaFile, InputGenerator.InputData inputData)
     {
       output.WriteInfo($"processing {javaFile}");
 
@@ -57,7 +64,7 @@
       {
         output.WriteSuccess($"compiled {javaFile}");
 
-        outputs = GetProgramOutputs(javaFile);
+        outputs = GetProgramOutputs(javaFile, inputData);
         foreach (var programOutput in outputs)
         {
           if (programOutput.HasTimedOut)
@@ -103,7 +110,9 @@
 
     public HomeworkResult ProcessHomework(string masterFolder, string homeworkFolder)
     {
-      var masterResult = ProcessMaster(masterFolder);
+      var inputData = inputGenerator.GetInputs(masterFolder);
+
+      var masterResult = ProcessMaster(masterFolder, inputData);
 
       var homeworkFiles = filesystemService.GetAllJavaFiles(homeworkFolder);
 
@@ -132,19 +141,12 @@
 
         var fileNameDiffernces = TextDiffGenerator.GenerateDiff(Path.GetFileName(masterResult.FileName), Path.GetFileName(homeworkFile));
 
-        var analysisResult = ProcessFileAnalysis(homeworkFile);
+        var analysisResult = ProcessFileAnalysis(homeworkFile, inputData);
 
         submissions.Add(new(similarityAnalysis, fileNameDiffernces, analysisResult));
       }
 
       return new(masterResult, submissions);
-    }
-
-    internal IEnumerable<Output> GetProgramOutputs(string fileName)
-    {
-      var folder = Path.GetDirectoryName(fileName)!;
-      var inputData = inputGenerator.GetInputs(folder);
-      return GetProgramOutputs(fileName, inputData);
     }
 
     internal IEnumerable<Output> GetProgramOutputs(string fileName, InputGenerator.InputData inputData)
