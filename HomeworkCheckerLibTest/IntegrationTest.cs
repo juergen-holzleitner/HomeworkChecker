@@ -82,12 +82,12 @@ namespace HomeworkCheckerLibTest
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("masterFolder", "*.java"))
-        .Returns(new List<string> { @$"masterFolder\masterFile.java" });
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"masterFolder\masterFile.java")).Returns("master source");
+        .Returns(new List<string> { @$"masterFolder\HomeworkFile.java" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"masterFolder\HomeworkFile.java")).Returns("master source");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(It.Is<string>(s => s.StartsWith("homeworkFolder")))).Returns("homework source");
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("homeworkFolder", "*.java"))
-        .Returns(new List<string> { @$"homeworkFolder\homeworkFile.java", @$"homeworkFolder2\homeworkFile.java" });
+        .Returns(new List<string> { @$"homeworkFolder\homeworkFile.java", @$"homeworkFolder2\HomeworkFile.java" });
 
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
@@ -104,7 +104,7 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\masterFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
+                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
 
       var outputMock = new Mock<IRuntimeOutput>();
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
@@ -113,12 +113,15 @@ namespace HomeworkCheckerLibTest
 
       outputMock.Verify(o => o.WriteWarning("processed jplag with 1 result(s), but 3 were expected"));
       outputMock.Verify(o => o.WriteInfo("processing homeworkFolder\\homeworkFile.java"));
-      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder2\\homeworkFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder2\\HomeworkFile.java"));
       outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
 
       result.Submissions.Should().HaveCount(2);
-      result.Submissions.First().Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\homeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
-      result.Submissions.First().Similarities.JplagSimilarities.Should().HaveCount(1);
+      var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileName == "homeworkFolder\\homeworkFile.java").Single();
+      homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
+      homework1Submission.Similarities.JplagSimilarities.Should().HaveCount(1);
+
+      homework1Submission.FileNameDifference.Diffs.Should().HaveCount(3);
     }
   }
 }
