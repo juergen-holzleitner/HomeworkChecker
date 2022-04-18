@@ -69,8 +69,8 @@ compile error
       var filenameDifferences = new TextDiffGenerator.Difference(fileNameDiffs);
       var fileNameAnalysis = new HomeworkChecker.FileNameAnalysis("java", "xxx", new(fileNameDiffs));
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, "ouputcontent", false);
-      HomeworkChecker.Output submissionOutput = new(input, "ouput content", false);
+      HomeworkChecker.Output masterOutput = new(input, "outputcontent", false);
+      HomeworkChecker.Output submissionOutput = new(input, "output content", false);
       var ouputDiffs = fileNameDiffs;
       var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
@@ -81,12 +81,13 @@ compile error
 
       System.Linq.Expressions.Expression<Func<string, bool>> verifyAllPartsIncluded = s =>
         s.Contains("<<<compile>>>")
-        // TODO: && s.Contains("output differences")
-        // TODO: && s.Contains("inputfile")
-        // TODO: && s.Contains("<<<input>>>")
-        // TODO: && s.Contains("<<<output>>>")
         && s.Contains("filename problems")
         && s.Contains("duplicate problems")
+        && s.Contains("output problems")
+        && s.Contains("inputFile.txt")
+        && s.Contains("input content")
+        && s.Contains("outputcontent")
+        && s.Contains("output content")
         && s.Contains("Jplag similarities")
         && s.Contains("<<<custom>>>")
         && s.Contains("<<<SpotBugs>>>")
@@ -165,6 +166,46 @@ filePath2.java (WhitespaceDifferences)
 	3. fileC.java: 50
 
 ");
+    }
+
+    [Fact]
+    public void Can_write_output_differences()
+    {
+      var input = new HomeworkChecker.Input("inputFile.txt", "input content");
+      HomeworkChecker.Output masterOutput = new(input, "ouputcontent", false);
+      HomeworkChecker.Output submissionOutput = new(input, "ouput content", false);
+      var ouputDiffs = new List<DiffMatchPatch.Diff>()
+      {
+        new(DiffMatchPatch.Operation.DELETE, "C"),
+        new(DiffMatchPatch.Operation.INSERT, "c"),
+        new(DiffMatchPatch.Operation.EQUAL, "ode")
+      };
+      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
+      var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
+
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendOutputDifferences(sb, outputDifference);
+
+      sb.ToString().Should().StartWith("## output problems");
+    }
+
+    [Fact]
+    public void Can_generate_expandable_block()
+    {
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendExpandableBlock(sb, "header", "content");
+
+      sb.ToString().Should().Be(@"<details>
+  <summary>Click to expand header</summary>
+
+content
+</details>
+
+");
+
+
     }
 
   }
