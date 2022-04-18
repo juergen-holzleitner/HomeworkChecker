@@ -13,15 +13,15 @@ namespace HomeworkCheckerLib
       return sb.ToString();
     }
 
-    internal static string FromSubmissionAnalysis(HomeworkChecker.SubmissionAnalysis analysisResult)
+    internal static string FromSubmissionAnalysis(HomeworkChecker.SubmissionAnalysis analysisResult, string baseFolder)
     {
       var sb = new StringBuilder();
 
       AppendFileNameIssues(sb, analysisResult.FileNameAnalysis);
 
-      AppendDuplicateIssues(sb, analysisResult.Similarities.Duplicates);
+      AppendDuplicateIssues(sb, analysisResult.Similarities.Duplicates, baseFolder);
 
-      AppendJplagSimilarities(sb, analysisResult.Similarities.JplagSimilarities, analysisResult.Similarities.JplagMasterSimilarity);
+      AppendJplagSimilarities(sb, analysisResult.Similarities.JplagSimilarities, analysisResult.Similarities.JplagMasterSimilarity, baseFolder);
 
       AppendOutputDifferences(sb, analysisResult.OutputDifference);
 
@@ -30,15 +30,22 @@ namespace HomeworkCheckerLib
       return sb.ToString();
     }
 
-    internal static void AppendDuplicateIssues(StringBuilder sb, IEnumerable<DuplicateFileAnalyzer.Similarity> duplicates)
+    internal static void AppendDuplicateIssues(StringBuilder sb, IEnumerable<DuplicateFileAnalyzer.Similarity> duplicates, string baseFolder)
     {
       if (!duplicates.Any())
         return;
 
-      var d = duplicates.Select(d => $"{d.FilePath} ({d.SimilarityMode})");
+      var d = duplicates.Select(d => $"{GenerateShortFileName(d.FilePath, baseFolder)} ({d.SimilarityMode})");
       AppendAnalysisIssue(sb, "duplicate problems", string.Join(Environment.NewLine, d));
     }
-    internal static void AppendJplagSimilarities(StringBuilder sb, IEnumerable<JplagProcessor.SubmissionSimilarity> jplagSimilarities, JplagProcessor.SubmissionSimilarity? masterSimilarity)
+    
+    private static string GenerateShortFileName(string javaFile, string baseFolder)
+    {
+      var outputName = javaFile[baseFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+      return outputName;
+    }
+
+    internal static void AppendJplagSimilarities(StringBuilder sb, IEnumerable<JplagProcessor.SubmissionSimilarity> jplagSimilarities, JplagProcessor.SubmissionSimilarity? masterSimilarity, string baseFolder)
     {
       if (!jplagSimilarities.Any() && masterSimilarity is null)
         return;
@@ -62,7 +69,7 @@ namespace HomeworkCheckerLib
         sb.AppendLine("* similar files");
         foreach (var f in mostSimilar)
         {
-          sb.AppendLine($"\t{pos}. {f.File}: {f.Similarity}");
+          sb.AppendLine($"\t{pos}. {GenerateShortFileName(f.File, baseFolder)}: {f.Similarity}");
           ++pos;
         }
         sb.AppendLine();

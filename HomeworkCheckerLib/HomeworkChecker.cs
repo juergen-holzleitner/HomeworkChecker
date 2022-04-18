@@ -14,7 +14,7 @@
 
     public record SubmissionAnalysis(SimilarityAnalysis Similarities, FileNameAnalysis FileNameAnalysis, OutputDifferencesAnalyzer.OutputDifferenceAnalysis OutputDifference, FileAnalysisResult AnalysisResult);
 
-    public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions);
+    public record HomeworkResult(FileAnalysisResult MasterResult, string SubmissionBaseFolder, IEnumerable<SubmissionAnalysis> Submissions);
 
     public HomeworkChecker()
       : this(new FileEnumerator(), new AppExecuter(), new RuntimeOutput())
@@ -171,7 +171,7 @@
         submissions.Add(new(similarityAnalysis, fileNameAnalysis, outputAnalysis, analysisResult));
       }
 
-      return new(masterResult, submissions);
+      return new(masterResult, homeworkFolder, submissions);
     }
 
     public void WriteAnalysisToMarkdownFile(FileAnalysisResult analysisResult)
@@ -186,7 +186,7 @@
       foreach (var analysis in analysisResult.Submissions)
       {
         var markdownFile = Path.Combine(Path.GetDirectoryName(analysis.AnalysisResult.FileName)!, "NOTES.md");
-        var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysis);
+        var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysis, analysisResult.SubmissionBaseFolder);
         filesystemService.AppendMarkdown(markdownFile, markdownText);
       }
     }

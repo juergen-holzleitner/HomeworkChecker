@@ -62,7 +62,7 @@ compile error
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
-      var duplicates = new List<DuplicateFileAnalyzer.Similarity> { new("file", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences) };
+      var duplicates = new List<DuplicateFileAnalyzer.Similarity> { new("outputFolder\\file", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences) };
       var jplagSimilarities = new List<JplagProcessor.SubmissionSimilarity>();
       var similarities = new HomeworkChecker.SimilarityAnalysis(duplicates, jplagSimilarities, new("Master.java", 99));
       var fileNameDiffs = new List<DiffMatchPatch.Diff>() { new(DiffMatchPatch.Operation.INSERT, "xxx"), new(DiffMatchPatch.Operation.DELETE, "java") };
@@ -75,7 +75,7 @@ compile error
       var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
       var submissionAnalysis = new HomeworkChecker.SubmissionAnalysis(similarities, fileNameAnalysis, outputDifference, analysisResult);
-      var homeworkResult = new HomeworkChecker.HomeworkResult(analysisResult, new List<HomeworkChecker.SubmissionAnalysis> { submissionAnalysis });
+      var homeworkResult = new HomeworkChecker.HomeworkResult(analysisResult, "outputFolder", new List<HomeworkChecker.SubmissionAnalysis> { submissionAnalysis });
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());
 
       sut.WriteAnalysisToMarkdownFile(homeworkResult);
@@ -126,12 +126,12 @@ compile error
     {
       var duplicates = new List<DuplicateFileAnalyzer.Similarity>
       {
-        new DuplicateFileAnalyzer.Similarity("filePath.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy),
-        new DuplicateFileAnalyzer.Similarity("filePath2.java", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences),
+        new DuplicateFileAnalyzer.Similarity(@"homeworkFolder\filePath.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy),
+        new DuplicateFileAnalyzer.Similarity(@"homeworkFodler\filePath2.java", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences),
       };
       var sb = new StringBuilder();
 
-      MarkdownGenerator.AppendDuplicateIssues(sb, duplicates);
+      MarkdownGenerator.AppendDuplicateIssues(sb, duplicates, "homeworkFolder");
 
       sb.ToString().Should().Be(@"## duplicate problems
 
@@ -148,14 +148,14 @@ filePath2.java (WhitespaceDifferences)
     {
       var jplagSimilarities = new List<JplagProcessor.SubmissionSimilarity>()
       {
-        new JplagProcessor.SubmissionSimilarity("fileA.java", 99),
-        new JplagProcessor.SubmissionSimilarity("fileB.java", 100),
-        new JplagProcessor.SubmissionSimilarity("fileC.java", 50),
+        new JplagProcessor.SubmissionSimilarity("homeworkFolder\\fileA.java", 99),
+        new JplagProcessor.SubmissionSimilarity("homeworkFolder\\fileB.java", 100),
+        new JplagProcessor.SubmissionSimilarity("homeworkFolder\\fileC.java", 50),
       };
       var masterSimilarity = new JplagProcessor.SubmissionSimilarity("Master.java", 53.0);
       var sb = new StringBuilder();
 
-      MarkdownGenerator.AppendJplagSimilarities(sb, jplagSimilarities, masterSimilarity);
+      MarkdownGenerator.AppendJplagSimilarities(sb, jplagSimilarities, masterSimilarity, "homeworkFolder");
 
       sb.ToString().Should().Be(@"## Jplag similarities
 
