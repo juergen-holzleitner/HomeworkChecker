@@ -44,12 +44,13 @@
     private FileAnalysisResult ProcessMaster(string masterFolder, InputGenerator.InputData inputData)
     {
       var javaFile = filesystemService.GetAllJavaFiles(masterFolder).Single();
-      return ProcessFileAnalysis(javaFile, inputData);
+      var outputName = javaFile[masterFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+      return ProcessFileAnalysis(outputName, javaFile, inputData);
     }
 
-    private FileAnalysisResult ProcessFileAnalysis(string javaFile, InputGenerator.InputData inputData)
+    private FileAnalysisResult ProcessFileAnalysis(string outputName, string javaFile, InputGenerator.InputData inputData)
     {
-      output.WriteInfo($"processing {javaFile}");
+      output.WriteInfo($"processing {outputName}");
 
       var compileOutput = string.Empty;
       IEnumerable<Output> outputs = Enumerable.Empty<Output>();
@@ -57,12 +58,12 @@
       var compileResult = javaCompiler.CompileFile(javaFile);
       if (!compileResult.CompileSucceeded)
       {
-        output.WriteError($"compiling {javaFile} failed");
+        output.WriteError($"compiling {outputName} failed");
         compileOutput = compileResult.CompileOutput;
       }
       else
       {
-        output.WriteSuccess($"compiled {javaFile}");
+        output.WriteSuccess($"compiled");
 
         outputs = GetProgramOutputs(javaFile, inputData);
         foreach (var programOutput in outputs)
@@ -116,6 +117,8 @@
 
       var homeworkFiles = filesystemService.GetAllJavaFiles(homeworkFolder);
 
+      output.WriteInfo(Environment.NewLine);
+
       var jplagResult = jplagProcessor.Process(masterFolder, homeworkFolder);
       var numResults = jplagResult.Similarities.Count();
       const int numberOfMasterFiles = 1;
@@ -131,19 +134,25 @@
       List<SubmissionAnalysis> submissions = new();
       foreach (var homeworkFile in homeworkFiles)
       {
+        output.WriteInfo(Environment.NewLine);
+
+        var outputName = homeworkFile[homeworkFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var analysisResult = ProcessFileAnalysis(outputName, homeworkFile, inputData);
+
         var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, possibleDuplicateFiles);
-        if (duplicateInfo.Any())
-          output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
-        else
-          output.WriteSuccess("no duplicates found");
         var jplagSimilarities = JplagProcessor.GetSubmissionSimilarities(homeworkFile, jplagResult.Similarities);
         var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities);
+        if (duplicateInfo.Any())
+          output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
 
         var fileNameDiffernces = TextDiffGenerator.GenerateDiff(Path.GetFileName(masterResult.FileName), Path.GetFileName(homeworkFile));
-
-        var analysisResult = ProcessFileAnalysis(homeworkFile, inputData);
+        if (fileNameDiffernces.Diffs.Any())
+          output.WriteWarning($"{homeworkFile} has filename differences");
 
         var outputAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterResult.Outputs, analysisResult.Outputs);
+        var numDifferences = outputAnalysis.Differences.Count(d => d.DifferenceType != OutputDifferencesAnalyzer.DifferenceType.Equal);
+        if (numDifferences > 0)
+          output.WriteWarning($"{numDifferences} output(s) differ");
 
         submissions.Add(new(similarityAnalysis, fileNameDiffernces, outputAnalysis, analysisResult));
       }

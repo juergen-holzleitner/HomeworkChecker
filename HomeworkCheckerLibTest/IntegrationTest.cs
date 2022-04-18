@@ -45,8 +45,8 @@ namespace HomeworkCheckerLibTest
 
       var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
       var outputSequence = new MockSequence();
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing arbitraryFolder\\someFile.java"));
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled arbitraryFolder\\someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteWarning("custom analysis issues"));
@@ -111,9 +111,10 @@ namespace HomeworkCheckerLibTest
 
       var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
 
+      outputMock.Verify(o => o.WriteInfo(System.Environment.NewLine), Times.Exactly(3));
       outputMock.Verify(o => o.WriteWarning("processed jplag with 1 result(s), but 3 were expected"));
-      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder\\homeworkFile.java"));
-      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder2\\HomeworkFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing homeworkFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing HomeworkFile.java"));
       outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
 
       result.Submissions.Should().HaveCount(2);
