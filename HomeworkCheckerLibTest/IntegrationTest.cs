@@ -73,6 +73,8 @@ namespace HomeworkCheckerLibTest
       result.SpotBugsIssues.Should().Be("SpotBugs content");
       result.CustomAnalysisIssues.Should().NotBeEmpty();
 
+      fileEnumeratorMock.Verify(x => x.RemoveFileIfExists(@$"{masterFolder}\someFile.class"));
+
       outputMock.VerifyAll();
     }
 

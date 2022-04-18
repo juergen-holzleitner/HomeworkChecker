@@ -106,6 +106,9 @@
         spotBugsOutput = spotBugsResult.SpotBugsOutput;
       }
 
+      var classFile = Path.ChangeExtension(javaFile, "class");
+      filesystemService.RemoveFileIfExists(classFile);
+
       return new(javaFile, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput, customAnalysisResult.CustomAnalysisOutput);
     }
 

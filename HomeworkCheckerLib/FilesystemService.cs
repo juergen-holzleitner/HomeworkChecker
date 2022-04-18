@@ -7,6 +7,7 @@
       IEnumerable<string> GetFilesInFolderRecursivly(string folder, string extension);
       string ReadFileContent(string filePath);
       void RemoveFolderIfExists(string folder);
+      void RemoveFileIfExists(string filePath);
     }
 
     readonly IFileEnumerator fileEnumerator;
@@ -36,5 +37,7 @@
     {
       return fileEnumerator.GetFilesInFolderRecursivly(folder, "*.txt");
     }
+
+    internal void RemoveFileIfExists(string folder) => fileEnumerator.RemoveFileIfExists(folder);
   }
 }

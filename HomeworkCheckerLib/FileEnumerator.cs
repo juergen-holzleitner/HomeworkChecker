@@ -17,5 +17,11 @@
       if (Directory.Exists(folder))
         Directory.Delete(folder, true);
     }
+
+    public void RemoveFileIfExists(string filePath)
+    {
+      if (File.Exists(filePath))
+        File.Delete(filePath);
+    }
   }
 }
