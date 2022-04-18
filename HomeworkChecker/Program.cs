@@ -18,7 +18,9 @@
       }
       else
       {
-        homeworkChecker.ProcessHomework(args[0], args[1]);
+        var analysisResult = homeworkChecker.ProcessHomework(args[0], args[1]);
+        foreach (var analysis in analysisResult.Submissions)
+          homeworkChecker.WriteAnalysisToMarkdownFile(analysis);
       }
     }
   }

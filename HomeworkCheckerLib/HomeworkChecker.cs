@@ -10,7 +10,9 @@
 
     public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities);
 
-    public record SubmissionAnalysis(SimilarityAnalysis Similarities, TextDiffGenerator.Difference FileNameDifference, OutputDifferencesAnalyzer.OutputDifferenceAnalysis OutputDifference, FileAnalysisResult AnalysisResult);
+    public record FileNameAnalysis(string Name, string ExpectedName, TextDiffGenerator.Difference FileNameDifference);
+
+    public record SubmissionAnalysis(SimilarityAnalysis Similarities, FileNameAnalysis FileNameAnalysis, OutputDifferencesAnalyzer.OutputDifferenceAnalysis OutputDifference, FileAnalysisResult AnalysisResult);
 
     public record HomeworkResult(FileAnalysisResult MasterResult, IEnumerable<SubmissionAnalysis> Submissions);
 
@@ -117,6 +119,7 @@
       var inputData = inputGenerator.GetInputs(masterFolder);
 
       var masterResult = ProcessMaster(masterFolder, inputData);
+      var masterFileName = Path.GetFileName(masterResult.FileName);
 
       var homeworkFiles = filesystemService.GetAllJavaFiles(homeworkFolder);
 
@@ -148,16 +151,18 @@
         if (duplicateInfo.Any())
           output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
 
-        var fileNameDiffernces = TextDiffGenerator.GenerateDiff(Path.GetFileName(masterResult.FileName), Path.GetFileName(homeworkFile));
-        if (fileNameDiffernces.Diffs.Any())
+        string homeworkFileName = Path.GetFileName(homeworkFile);
+        var fileNameDifferences = TextDiffGenerator.GenerateDiff(masterFileName, homeworkFileName);
+        if (fileNameDifferences.Diffs.Any())
           output.WriteWarning($"{homeworkFile} has filename differences");
+        var fileNameAnalysis = new FileNameAnalysis(masterFileName, homeworkFileName, fileNameDifferences);
 
         var outputAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterResult.Outputs, analysisResult.Outputs);
         var numDifferences = outputAnalysis.Differences.Count(d => d.DifferenceType != OutputDifferencesAnalyzer.DifferenceType.Equal);
         if (numDifferences > 0)
           output.WriteWarning($"{numDifferences} output(s) differ");
 
-        submissions.Add(new(similarityAnalysis, fileNameDiffernces, outputAnalysis, analysisResult));
+        submissions.Add(new(similarityAnalysis, fileNameAnalysis, outputAnalysis, analysisResult));
       }
 
       return new(masterResult, submissions);
@@ -167,6 +172,12 @@
     {
       var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.FileName)!, "NOTES.md");
       var markdownText = MarkdownGenerator.FromFileAnalysis(analysisResult);
+      filesystemService.AppendMarkdown(markdownFile, markdownText);
+    }
+    public void WriteAnalysisToMarkdownFile(SubmissionAnalysis analysisResult)
+    {
+      var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.AnalysisResult.FileName)!, "NOTES.md");
+      var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysisResult);
       filesystemService.AppendMarkdown(markdownFile, markdownText);
     }
 

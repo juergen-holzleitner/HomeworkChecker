@@ -124,7 +124,7 @@ namespace HomeworkCheckerLibTest
       homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
       homework1Submission.Similarities.JplagSimilarities.Should().HaveCount(1);
 
-      homework1Submission.FileNameDifference.Diffs.Should().HaveCount(3);
+      homework1Submission.FileNameAnalysis.FileNameDifference.Diffs.Should().HaveCount(3);
 
       homework1Submission.OutputDifference.Differences.Single().DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.Different);
 
