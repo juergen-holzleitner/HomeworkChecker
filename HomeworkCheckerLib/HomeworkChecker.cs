@@ -68,7 +68,7 @@
       {
         output.WriteSuccess($"compiled");
 
-        outputs = GetProgramOutputs(javaFile, inputData);
+        outputs = GetProgramOutputs(javaFile, inputData).ToList();
         foreach (var programOutput in outputs)
         {
           if (programOutput.HasTimedOut)

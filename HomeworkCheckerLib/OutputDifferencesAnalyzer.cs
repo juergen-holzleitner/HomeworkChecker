@@ -13,12 +13,12 @@ namespace HomeworkCheckerLib
     {
       Trace.Assert(masterOutput.Count() == submissionOutput.Count());
 
-      var differences = GetSubmissionDiffernces(masterOutput, submissionOutput);
+      var differences = GetSubmissionDifferences(masterOutput, submissionOutput);
 
       return new(differences);
     }
 
-    private static IEnumerable<OutputDifference> GetSubmissionDiffernces(IEnumerable<HomeworkChecker.Output> masterOutput, IEnumerable<HomeworkChecker.Output> submissionOutput)
+    private static IEnumerable<OutputDifference> GetSubmissionDifferences(IEnumerable<HomeworkChecker.Output> masterOutput, IEnumerable<HomeworkChecker.Output> submissionOutput)
     {
       foreach (var s in submissionOutput)
       {
