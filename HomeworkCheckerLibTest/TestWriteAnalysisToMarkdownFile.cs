@@ -45,7 +45,7 @@ namespace HomeworkCheckerLibTest
     {
       var sb = new StringBuilder();
 
-      MarkdownGenerator.AppendAnalysisIssue(sb, "compile problems", "compile error");
+      MarkdownGenerator.AppendAnalysisIssue(sb, "compile problems", "\r\ncompile error\n");
 
       sb.ToString().Should().Be(
 @"## compile problems

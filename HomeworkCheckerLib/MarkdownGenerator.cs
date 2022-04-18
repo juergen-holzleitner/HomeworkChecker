@@ -22,10 +22,12 @@ namespace HomeworkCheckerLib
       if (string.IsNullOrEmpty(issueText))
         return;
 
+      var timmedIssueText = issueText.Trim('\r', '\n');
+
       sb.AppendLine("## " + header);
       sb.AppendLine();
       sb.AppendLine("```");
-      sb.AppendLine(issueText);
+      sb.AppendLine(timmedIssueText);
       sb.AppendLine("```");
       sb.AppendLine();
     }

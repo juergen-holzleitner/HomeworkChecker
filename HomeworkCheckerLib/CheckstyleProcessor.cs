@@ -21,6 +21,10 @@ namespace HomeworkCheckerLib
       Trace.Assert(result.ExitCode == 0, $"checkstyle is not expected to return {result.ExitCode}");
 
       var output = CleanOutput(result.Output);
+      var basePath = Path.GetDirectoryName(javaPath);
+      if (!string.IsNullOrEmpty(basePath))
+        output = RemovePathsFromOutput(output, basePath + Path.DirectorySeparatorChar);
+
       return new(result.ExitCode, output);
     }
 
@@ -30,6 +34,13 @@ namespace HomeworkCheckerLib
       output = output.Replace("Audit done.\r\n", string.Empty);
 
       return output.Trim();
+    }
+
+    internal static string RemovePathsFromOutput(string output, string path)
+    {
+      output = output.Replace(path, string.Empty);
+
+      return output;
     }
   }
 }
