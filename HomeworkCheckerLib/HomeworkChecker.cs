@@ -8,7 +8,7 @@
 
     public record FileAnalysisResult(string FileName, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
-    public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities);
+    public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities, JplagProcessor.SubmissionSimilarity? JplagMasterSimilarity);
 
     public record FileNameAnalysis(string Name, string ExpectedName, TextDiffGenerator.Difference FileNameDifference);
 
@@ -147,7 +147,8 @@
 
         var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, possibleDuplicateFiles);
         var jplagSimilarities = JplagProcessor.GetSubmissionSimilarities(homeworkFile, jplagResult.Similarities);
-        var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities);
+        var masterSimilarity = jplagSimilarities.Where(j => j.File == masterResult.FileName).SingleOrDefault();
+        var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities.Where(j => j.File != masterResult.FileName), masterSimilarity);
         if (duplicateInfo.Any())
           output.WriteWarning($"{homeworkFile} has {duplicateInfo.Count()} duplicate(s)");
 

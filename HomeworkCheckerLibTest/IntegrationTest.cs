@@ -106,7 +106,7 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
+                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75\r\nComparing \"homeworkFolder2\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
 
       var outputMock = new Mock<IRuntimeOutput>();
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
@@ -114,7 +114,7 @@ namespace HomeworkCheckerLibTest
       var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
 
       outputMock.Verify(o => o.WriteInfo(System.Environment.NewLine), Times.Exactly(3));
-      outputMock.Verify(o => o.WriteWarning("processed jplag with 1 result(s), but 3 were expected"));
+      outputMock.Verify(o => o.WriteWarning("processed jplag with 2 result(s), but 3 were expected"));
       outputMock.Verify(o => o.WriteInfo("processing homeworkFile.java"));
       outputMock.Verify(o => o.WriteInfo("processing HomeworkFile.java"));
       outputMock.Verify(o => o.WriteWarning("homeworkFolder\\homeworkFile.java has 1 duplicate(s)"));
@@ -123,6 +123,7 @@ namespace HomeworkCheckerLibTest
       var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileName == "homeworkFolder\\homeworkFile.java").Single();
       homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@$"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
       homework1Submission.Similarities.JplagSimilarities.Should().HaveCount(1);
+      homework1Submission.Similarities.JplagMasterSimilarity.Should().NotBeNull();
 
       homework1Submission.FileNameAnalysis.FileNameDifference.Diffs.Should().HaveCount(3);
 
