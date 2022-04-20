@@ -32,20 +32,36 @@ namespace HomeworkCheckerLib
     internal void AddText(string fileName, int lineNumber, string textToAdd)
     {
       var fileContent = filesystemService.ReadFileContent(fileName);
-      using (StringReader reader = new(fileContent))
-      using (StringWriter writer = new())
+      using StringReader reader = new(fileContent);
+      using StringWriter writer = new();
+      int currentLine = 1;
+      string? line;
+      while ((line = reader.ReadLine()) != null)
       {
-        int currentLine = 1;
-        string? line;
-        while ((line = reader.ReadLine()) != null)
-        {
-          writer.WriteLine(line);
-          if (lineNumber == currentLine)
-            writer.Write(textToAdd);
-          ++currentLine;
-        }
-        filesystemService.WriteFileContent(fileName, writer.ToString());
+        writer.WriteLine(line);
+        if (lineNumber == currentLine)
+          writer.Write(textToAdd);
+        ++currentLine;
       }
+      filesystemService.WriteFileContent(fileName, writer.ToString());
+    }
+
+    internal void ReplaceText(string fileName, int lineNumber, string textToAdd)
+    {
+      var fileContent = filesystemService.ReadFileContent(fileName);
+      using StringReader reader = new(fileContent);
+      using StringWriter writer = new();
+      int currentLine = 1;
+      string? line;
+      while ((line = reader.ReadLine()) != null)
+      {
+        if (lineNumber == currentLine)
+          writer.Write(textToAdd);
+        else
+          writer.WriteLine(line);
+        ++currentLine;
+      }
+      filesystemService.WriteFileContent(fileName, writer.ToString());
     }
   }
 }

@@ -44,6 +44,23 @@ namespace HomeworkCheckerLibTest
       fileEnumerator.Verify(f => f.WriteAllText(fileName, "old text\r\nnew text\n"));
     }
 
+    [Fact]
+    public void Can_replace_text_at_line()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+      const string fileName = "fileA.java";
+
+      string folder = "homeworkFolder";
+      fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
+      fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns("old text");
+
+      var sut = new PercentageAdder(fileEnumerator.Object);
+
+      sut.ReplaceText(fileName, 1, "new text\n");
+
+      fileEnumerator.Verify(f => f.WriteAllText(fileName, "new text\n"));
+    }
+
 
   }
 }
