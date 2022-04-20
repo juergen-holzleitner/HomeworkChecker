@@ -24,7 +24,11 @@
         homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
 
         if (homeworkChecker.StartVSCodeWithFolder(args[1]) == 0)
+        {
           homeworkChecker.CleanUpMarkdownFiles(analysisResult);
+          var percentageAdder = new HomeworkCheckerLib.PercentageAdder();
+          percentageAdder.ProcessPercentages(analysisResult.SubmissionBaseFolder);
+        }
       }
     }
   }
