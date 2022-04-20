@@ -55,6 +55,9 @@ namespace HomeworkCheckerLib
         }
       }
 
+      if (totalPercentage <= 0)
+        output.WriteWarning($"invalid final percentage {totalPercentage}%");
+
       var totalPercentageText = $"// [Total: {totalPercentage}%]{Environment.NewLine}";
       if (totalPercentageLine.HasValue)
         ReplaceText(fileName, totalPercentageLine.Value, totalPercentageText);

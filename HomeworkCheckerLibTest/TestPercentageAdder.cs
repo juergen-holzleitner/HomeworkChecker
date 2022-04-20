@@ -161,5 +161,28 @@ namespace HomeworkCheckerLibTest
 
       totalPercentage.Should().Be(expectedValue);
     }
+
+    [Fact]
+    public void Print_warning_if_final_percentage_is_invalid()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+
+      const string folder = "homeworkFolder";
+      const string fileName = "fileA.java";
+
+      fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
+      fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
+// Todo: some leftovers
+// some issue [-70%] // some other [-40%]
+");
+      var output = new Mock<IRuntimeOutput>();
+
+      var sut = new PercentageAdder(fileEnumerator.Object, output.Object);
+
+      sut.ProcessPercentages(folder);
+
+      output.Verify(o => o.WriteWarning($"invalid final percentage -10%"));
+    }
+
   }
 }
