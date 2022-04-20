@@ -28,5 +28,24 @@ namespace HomeworkCheckerLib
     {
       var fileContent = filesystemService.ReadFileContent(file);
     }
+
+    internal void AddText(string fileName, int lineNumber, string textToAdd)
+    {
+      var fileContent = filesystemService.ReadFileContent(fileName);
+      using (StringReader reader = new(fileContent))
+      using (StringWriter writer = new())
+      {
+        int currentLine = 1;
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+          writer.WriteLine(line);
+          if (lineNumber == currentLine)
+            writer.Write(textToAdd);
+          ++currentLine;
+        }
+        filesystemService.WriteFileContent(fileName, writer.ToString());
+      }
+    }
   }
 }

@@ -9,6 +9,7 @@
       void RemoveFolderIfExists(string folder);
       void RemoveFileIfExists(string filePath);
       void AppendAllText(string fileName, string markdown);
+      void WriteAllText(string fileName, string fileContent);
     }
 
     readonly IFileEnumerator fileEnumerator;
@@ -47,6 +48,11 @@
         return;
 
       fileEnumerator.AppendAllText(fileName, markdown);
+    }
+
+    internal void WriteFileContent(string fileName, string fileContent)
+    {
+      fileEnumerator.WriteAllText(fileName, fileContent);
     }
   }
 }

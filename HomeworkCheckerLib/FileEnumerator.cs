@@ -24,9 +24,14 @@
         File.Delete(filePath);
     }
 
-    public void AppendAllText(string fileName, string markdown)
+    public void AppendAllText(string fileName, string fileContent)
     {
-      File.AppendAllText(fileName, markdown);
+      File.AppendAllText(fileName, fileContent);
+    }
+
+    public void WriteAllText(string fileName, string fileContent)
+    {
+      File.WriteAllText(fileName, fileContent);
     }
   }
 }
