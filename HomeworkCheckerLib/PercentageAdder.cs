@@ -24,15 +24,16 @@ namespace HomeworkCheckerLib
     {
       var files = filesystemService.GetAllJavaFiles(folder);
       foreach (var file in files)
-        ProcessFile(file);
+        ProcessFile(folder, file);
     }
 
-    private void ProcessFile(string fileName)
+    private void ProcessFile(string folder, string fileName)
     {
       int totalPercentage = 100;
       int? totalPercentageLine = null;
       int? previousTotalPercentageValue = null;
       int lastNonEmptyLine = 0;
+      var outputName = fileName[folder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
       var fileContent = filesystemService.ReadFileContent(fileName);
       using (var reader = new StringReader(fileContent))
@@ -41,9 +42,9 @@ namespace HomeworkCheckerLib
         string? line;
         while ((line = reader.ReadLine()) != null)
         {
-          GeneralLineCheck(lineNumber, line);
+          GeneralLineCheck(outputName, lineNumber, line);
 
-          var linePercentage = GetPercentageFromLine(lineNumber, line) ?? 0;
+          var linePercentage = GetPercentageFromLine(outputName, lineNumber, line) ?? 0;
           totalPercentage += linePercentage;
 
           previousTotalPercentageValue = GetTotalPercentageValue(line);
@@ -58,7 +59,7 @@ namespace HomeworkCheckerLib
       }
 
       if (totalPercentage <= 0)
-        output.WriteWarning($"invalid final percentage {totalPercentage}%");
+        output.WriteWarning($"{outputName}: invalid final percentage {totalPercentage}%");
 
       var totalPercentageText = $"// [Total: {totalPercentage}%]{Environment.NewLine}";
       if (totalPercentageLine.HasValue)
@@ -66,15 +67,15 @@ namespace HomeworkCheckerLib
         if (previousTotalPercentageValue!.Value != totalPercentage)
         {
           ReplaceText(fileName, totalPercentageLine.Value, totalPercentageText);
-          output.WriteSuccess($"{fileName}: (updated from {previousTotalPercentageValue!.Value}%): {totalPercentage}%");
+          output.WriteSuccess($"{outputName}: (updated from {previousTotalPercentageValue!.Value}%): {totalPercentage}%");
         }
         else
-          output.WriteSuccess($"{fileName}: (already set): {totalPercentage}%");
+          output.WriteSuccess($"{outputName}: (already set): {totalPercentage}%");
       }
       else
       {
         AddText(fileName, lastNonEmptyLine, totalPercentageText);
-        output.WriteSuccess($"{fileName}: {totalPercentage}%");
+        output.WriteSuccess($"{outputName}: {totalPercentage}%");
       }
     }
 
@@ -113,7 +114,7 @@ namespace HomeworkCheckerLib
       filesystemService.WriteFileContent(fileName, writer.ToString());
     }
 
-    internal int? GetPercentageFromLine(int lineNumber, string line)
+    internal int? GetPercentageFromLine(string outputName, int lineNumber, string line)
     {
       var precentagePattern = new Regex(@".*?//.*?\[\s*(?<percentage>[+-]?\d+)\s*%\s*\]");
       var matches = precentagePattern.Matches(line);
@@ -128,7 +129,7 @@ namespace HomeworkCheckerLib
           var valueText = match.Groups["percentage"].Value;
           var value = int.Parse(valueText);
           if (value >= 0)
-            output.WriteWarning($"line {lineNumber}: unusual percentage {valueText}%");
+            output.WriteWarning($"{outputName}:{lineNumber}: unusual percentage {valueText}%");
           totalValue += value;
         }
       }
@@ -136,11 +137,11 @@ namespace HomeworkCheckerLib
       return totalValue;
     }
 
-    internal void GeneralLineCheck(int lineNumber, string line)
+    internal void GeneralLineCheck(string outputName, int lineNumber, string line)
     {
       int pos = line.ToUpper().IndexOf("TODO");
       if (pos >= 0)
-        output.WriteWarning($"line {lineNumber}: {line[pos..]}");
+        output.WriteWarning($"{outputName}:{lineNumber}: {line[pos..]}");
     }
 
     internal int? GetTotalPercentageValue(string line)

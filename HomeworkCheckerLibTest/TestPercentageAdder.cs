@@ -18,7 +18,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
@@ -42,7 +42,7 @@ namespace HomeworkCheckerLibTest
 
 "));
 
-      output.Verify(o => o.WriteWarning("line 2: Todo: some leftovers"));
+      output.Verify(o => o.WriteWarning("fileA.java:2: Todo: some leftovers"));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
@@ -74,7 +74,7 @@ namespace HomeworkCheckerLibTest
 // [Total: 90%]
 "));
 
-      output.Verify(o => o.WriteWarning("line 2: Todo: some leftovers"));
+      output.Verify(o => o.WriteWarning("fileA.java:2: Todo: some leftovers"));
     }
 
     [Fact]
@@ -119,7 +119,7 @@ namespace HomeworkCheckerLibTest
     {
       var sut = new PercentageAdder(Mock.Of<FilesystemService.IFileEnumerator>(), Mock.Of<IRuntimeOutput>());
 
-      var percentage = sut.GetPercentageFromLine(1, line);
+      var percentage = sut.GetPercentageFromLine("fileA.java", 1, line);
  
       percentage.Should().Be(expectedValue);
     }
@@ -132,9 +132,9 @@ namespace HomeworkCheckerLibTest
       const string line = "// [0%]";
       var sut = new PercentageAdder(Mock.Of<FilesystemService.IFileEnumerator>(), outputMock.Object);
 
-      sut.GetPercentageFromLine(1, line);
+      sut.GetPercentageFromLine("fileA.java", 1, line);
 
-      outputMock.Verify(o => o.WriteWarning("line 1: unusual percentage 0%"));
+      outputMock.Verify(o => o.WriteWarning("fileA.java:1: unusual percentage 0%"));
     }
 
     [Fact]
@@ -145,9 +145,9 @@ namespace HomeworkCheckerLibTest
       const string line = "// TODO: fix this";
       var sut = new PercentageAdder(Mock.Of<FilesystemService.IFileEnumerator>(), outputMock.Object);
 
-      sut.GeneralLineCheck(1, line);
+      sut.GeneralLineCheck("fileA.java", 1, line);
 
-      outputMock.Verify(o => o.WriteWarning("line 1: TODO: fix this"));
+      outputMock.Verify(o => o.WriteWarning("fileA.java:1: TODO: fix this"));
     }
 
     [Theory]
@@ -168,7 +168,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
@@ -181,7 +181,7 @@ namespace HomeworkCheckerLibTest
 
       sut.ProcessPercentages(folder);
 
-      output.Verify(o => o.WriteWarning($"invalid final percentage -10%"));
+      output.Verify(o => o.WriteWarning($"fileA.java: invalid final percentage -10%"));
     }
 
     [Fact]
@@ -190,7 +190,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
@@ -212,7 +212,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
@@ -235,7 +235,7 @@ namespace HomeworkCheckerLibTest
       var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
 
       const string folder = "homeworkFolder";
-      const string fileName = "fileA.java";
+      const string fileName = "homeworkFolder\\fileA.java";
 
       fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
       fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
