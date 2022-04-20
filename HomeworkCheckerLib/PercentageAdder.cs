@@ -31,6 +31,7 @@ namespace HomeworkCheckerLib
     {
       int totalPercentage = 100;
       int? totalPercentageLine = null;
+      int? previousTotalPercentageValue = null;
       int lastNonEmptyLine = 0;
 
       var fileContent = filesystemService.ReadFileContent(fileName);
@@ -45,7 +46,8 @@ namespace HomeworkCheckerLib
           var linePercentage = GetPercentageFromLine(lineNumber, line) ?? 0;
           totalPercentage += linePercentage;
 
-          if (GetTotalPercentageValue(line).HasValue)
+          previousTotalPercentageValue = GetTotalPercentageValue(line);
+          if (previousTotalPercentageValue.HasValue)
             totalPercentageLine = lineNumber;
 
           if (!string.IsNullOrEmpty(line))
@@ -60,9 +62,20 @@ namespace HomeworkCheckerLib
 
       var totalPercentageText = $"// [Total: {totalPercentage}%]{Environment.NewLine}";
       if (totalPercentageLine.HasValue)
-        ReplaceText(fileName, totalPercentageLine.Value, totalPercentageText);
+      {
+        if (previousTotalPercentageValue!.Value != totalPercentage)
+        {
+          ReplaceText(fileName, totalPercentageLine.Value, totalPercentageText);
+          output.WriteSuccess($"{fileName}: (updated from {previousTotalPercentageValue!.Value}%): {totalPercentage}%");
+        }
+        else
+          output.WriteSuccess($"{fileName}: (already set): {totalPercentage}%");
+      }
       else
+      {
         AddText(fileName, lastNonEmptyLine, totalPercentageText);
+        output.WriteSuccess($"{fileName}: {totalPercentage}%");
+      }
     }
 
     internal void AddText(string fileName, int lineNumber, string textToAdd)

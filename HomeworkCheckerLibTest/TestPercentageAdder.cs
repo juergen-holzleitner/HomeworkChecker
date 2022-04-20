@@ -184,5 +184,73 @@ namespace HomeworkCheckerLibTest
       output.Verify(o => o.WriteWarning($"invalid final percentage -10%"));
     }
 
+    [Fact]
+    public void Print_final_percentages()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+
+      const string folder = "homeworkFolder";
+      const string fileName = "fileA.java";
+
+      fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
+      fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
+// Todo: some leftovers
+// some issue [-70%]
+");
+      var output = new Mock<IRuntimeOutput>();
+
+      var sut = new PercentageAdder(fileEnumerator.Object, output.Object);
+
+      sut.ProcessPercentages(folder);
+
+      output.Verify(o => o.WriteSuccess("fileA.java: 30%"));
+    }
+
+    [Fact]
+    public void Print_updates_of_final_percentages()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+
+      const string folder = "homeworkFolder";
+      const string fileName = "fileA.java";
+
+      fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
+      fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
+// Todo: some leftovers
+// some issue [-70%]
+// [Total: 50%]
+");
+      var output = new Mock<IRuntimeOutput>();
+
+      var sut = new PercentageAdder(fileEnumerator.Object, output.Object);
+
+      sut.ProcessPercentages(folder);
+
+      output.Verify(o => o.WriteSuccess("fileA.java: (updated from 50%): 30%"));
+    }
+
+    [Fact]
+    public void Do_not_update_if_final_value_is_already_set()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+
+      const string folder = "homeworkFolder";
+      const string fileName = "fileA.java";
+
+      fileEnumerator.Setup(f => f.GetFilesInFolderRecursivly(folder, It.IsAny<string>())).Returns(new List<string> { fileName });
+      fileEnumerator.Setup(f => f.ReadFileContent(fileName)).Returns(@"some code
+// Todo: some leftovers
+// some issue [-70%]
+// [Total: 30%]
+");
+      var output = new Mock<IRuntimeOutput>();
+
+      var sut = new PercentageAdder(fileEnumerator.Object, output.Object);
+
+      sut.ProcessPercentages(folder);
+
+      output.Verify(o => o.WriteSuccess("fileA.java: (already set): 30%"));
+      fileEnumerator.Verify(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
   }
 }
