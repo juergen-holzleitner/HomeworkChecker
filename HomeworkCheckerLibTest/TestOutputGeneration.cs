@@ -60,7 +60,6 @@ namespace HomeworkCheckerLibTest
       var outputs = sut.GetProgramOutputs(Path.Combine("masterfolder", "program.java"), emptyInputData);
 
       outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new("[no input]", string.Empty), 0, "output", false) });
-
     }
 
   }

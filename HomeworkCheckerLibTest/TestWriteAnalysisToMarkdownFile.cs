@@ -218,7 +218,7 @@ content
 
       sb.ToString().Should().Be(@"## output problems
 
-generation for inputFile.txt has ExitCode -1
+generation for inputFile.txt has <span style=""color:Red;font-weight:bold"">ExitCode -1</span>
 
 <details>
   <summary>Click to expand input</summary>

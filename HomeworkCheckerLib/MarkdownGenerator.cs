@@ -111,7 +111,7 @@ namespace HomeworkCheckerLib
 
         foreach (var output in outputsWithProblems)
         {
-          sb.AppendLine($"generation for {output.Input.Filename} has ExitCode {output.ExitCode}");
+          sb.AppendLine($"generation for {output.Input.Filename} has <span style=\"color:Red;font-weight:bold\">ExitCode {output.ExitCode}</span>");
           sb.AppendLine();
 
           if (!string.IsNullOrEmpty(output.Input.FileContent))
