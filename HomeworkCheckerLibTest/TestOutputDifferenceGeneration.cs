@@ -56,6 +56,8 @@ namespace HomeworkCheckerLibTest
       diff.SubmissionOutput.Should().Be(submissionOutput.Single());
       diff.DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.Different);
       diff.Difference.Diffs.Should().HaveCount(2);
+      diff.Difference.Diffs[0].Should().Be(new DiffMatchPatch.Diff(DiffMatchPatch.Operation.DELETE, "X"));
+      diff.Difference.Diffs[1].Should().Be(new DiffMatchPatch.Diff(DiffMatchPatch.Operation.EQUAL, "ouputcontent"));
     }
 
     [Fact]

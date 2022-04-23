@@ -29,7 +29,7 @@ namespace HomeworkCheckerLib
 
     private static OutputDifference GetOutputDifference(HomeworkChecker.Output master, HomeworkChecker.Output submission)
     {
-      var diff = TextDiffGenerator.GenerateDiff(master.OutputContent, submission.OutputContent);
+      var diff = TextDiffGenerator.GenerateDiff(submission.OutputContent, master.OutputContent);
 
       if (master.OutputContent == submission.OutputContent)
         return new(master, submission, DifferenceType.Equal, diff);
