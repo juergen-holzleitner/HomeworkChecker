@@ -4,7 +4,7 @@
   {
     public record Input(string Filename, string FileContent);
 
-    public record Output(Input Input, string OutputContent, bool HasTimedOut);
+    public record Output(Input Input, int ExitCode, string OutputContent, bool HasTimedOut);
 
     public record FileAnalysisResult(string FileName, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
@@ -73,6 +73,8 @@
         {
           if (programOutput.HasTimedOut)
             output.WriteError($"generation of output for {programOutput.Input.Filename} timed out");
+          else if (programOutput.ExitCode != 0)
+            output.WriteError($"generation of output for {programOutput.Input.Filename} has exit code {programOutput.ExitCode}");
           else
             output.WriteSuccess($"generated output for {programOutput.Input.Filename}");
         }
@@ -229,13 +231,13 @@
         foreach (var input in inputData.Inputs)
         {
           var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
-          yield return new Output(input, output.Content, output.HasTimedOut);
+          yield return new Output(input, output.ExitCode, output.Content, output.HasTimedOut);
         }
       }
       else
       {
-        var output = outputGenerator.GenerateOutput(fileName, null);
-        yield return new Output(new("<no input>", string.Empty), output.Content, output.HasTimedOut);
+        var output = outputGenerator.GenerateOutput(fileName);
+        yield return new Output(new("<no input>", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
       }
     }
 

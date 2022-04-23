@@ -14,7 +14,7 @@ namespace HomeworkCheckerLibTest
     public void Can_write_analysis_to_markdown()
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
-      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
+      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 1, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());
 
       sut.WriteAnalysisToMarkdownFile(analysisResult);
@@ -61,7 +61,7 @@ compile error
     public void Can_write_submission_analysis_to_markdown()
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
-      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
+      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 0, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
       var duplicates = new List<DuplicateFileAnalyzer.Similarity> { new("outputFolder\\file", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences) };
       var jplagSimilarities = new List<JplagProcessor.SubmissionSimilarity>();
       var similarities = new HomeworkChecker.SimilarityAnalysis(duplicates, jplagSimilarities, new("Master.java", 99));
@@ -69,8 +69,8 @@ compile error
       var filenameDifferences = new TextDiffGenerator.Difference(fileNameDiffs);
       var fileNameAnalysis = new HomeworkChecker.FileNameAnalysis("java", "xxx", new(fileNameDiffs));
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, "outputcontent", false);
-      HomeworkChecker.Output submissionOutput = new(input, "output content", false);
+      HomeworkChecker.Output masterOutput = new(input, 0, "outputcontent", false);
+      HomeworkChecker.Output submissionOutput = new(input, 0, "output content", false);
       var ouputDiffs = fileNameDiffs;
       var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
@@ -173,8 +173,8 @@ filePath2.java (WhitespaceDifferences)
     public void Can_write_output_differences()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, "ouputcontent", false);
-      HomeworkChecker.Output submissionOutput = new(input, "ouput content", false);
+      HomeworkChecker.Output masterOutput = new(input, 0, "ouputcontent", false);
+      HomeworkChecker.Output submissionOutput = new(input, 0, "ouput content", false);
       var ouputDiffs = new List<DiffMatchPatch.Diff>()
       {
         new(DiffMatchPatch.Operation.DELETE, "C"),

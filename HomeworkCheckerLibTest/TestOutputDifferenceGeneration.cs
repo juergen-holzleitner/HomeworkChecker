@@ -14,8 +14,8 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, "ouputcontent", false) };
-      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, "ouput content", false) };
+      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouput content", false) };
 
       var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
 
@@ -30,8 +30,8 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences_of_equal_files()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, "ouputcontent", false) };
-      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
 
       var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
 
@@ -46,8 +46,8 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences_of_different_files()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, "ouputcontent", false) };
-      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, "Xouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "Xouputcontent", false) };
 
       var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
 
