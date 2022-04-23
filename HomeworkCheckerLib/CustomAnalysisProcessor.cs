@@ -40,6 +40,7 @@ namespace HomeworkCheckerLib
         new (@"format[^%]*\)", "use of format without %"),
         new ("printf", "use of printf instead of format"),
         new ("\"\"", "use of empty string"),
+        new ("\".\"", "use of string for a single character"),
         new (@"\s+[%\\]n", "space before newline"),
         new (@"\\n", "use of \\n instead of %n"),
         new (@"format\s*\(\s*""\s*[%\\]n\s*""\s*\)", "format is used to print a newline"),
