@@ -205,8 +205,40 @@ content
 </details>
 
 ");
+    }
 
+    [Fact]
+    public void Can_generate_output_problems()
+    {
+      var input = new HomeworkChecker.Input("inputFile.txt", "input content");
+      HomeworkChecker.Output output = new(input, -1, "ouputcontent", false);
 
+      var sb = new StringBuilder();
+      MarkdownGenerator.AppendOutputProblems(sb, new List<HomeworkChecker.Output> { output });
+
+      sb.ToString().Should().Be(@"## output problems
+
+generation for inputFile.txt has ExitCode -1
+
+<details>
+  <summary>Click to expand input</summary>
+
+```
+input content
+```
+
+</details>
+
+<details>
+  <summary>Click to expand output</summary>
+
+```
+ouputcontent
+```
+
+</details>
+
+");
     }
 
   }

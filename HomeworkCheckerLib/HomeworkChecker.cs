@@ -237,7 +237,7 @@
       else
       {
         var output = outputGenerator.GenerateOutput(fileName);
-        yield return new Output(new("<no input>", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
+        yield return new Output(new("[no input]", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
       }
     }
 

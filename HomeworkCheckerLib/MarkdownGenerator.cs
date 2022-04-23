@@ -94,10 +94,42 @@ namespace HomeworkCheckerLib
     private static void AppendFileAnalysisProblems(StringBuilder sb, HomeworkChecker.FileAnalysisResult analysisResult)
     {
       AppendAnalysisIssue(sb, "compile problems", analysisResult.CompileIssues);
+      AppendOutputProblems(sb, analysisResult.Outputs);
       AppendAnalysisIssue(sb, "Custom problems", analysisResult.CustomAnalysisIssues);
       AppendAnalysisIssue(sb, "SpotBugs problems", analysisResult.SpotBugsIssues);
       AppendAnalysisIssue(sb, "PMD problems", analysisResult.PMDIssues);
       AppendAnalysisIssue(sb, "checkstyle problems", analysisResult.CheckstyleIssues);
+    }
+
+    internal static void AppendOutputProblems(StringBuilder sb, IEnumerable<HomeworkChecker.Output> outputs)
+    {
+      var outputsWithProblems = outputs.Where(o => o.ExitCode != 0);
+      if (outputsWithProblems.Any())
+      {
+        sb.AppendLine("## output problems");
+        sb.AppendLine();
+
+        foreach (var output in outputsWithProblems)
+        {
+          sb.AppendLine($"generation for {output.Input.Filename} has ExitCode {output.ExitCode}");
+          sb.AppendLine();
+
+          if (!string.IsNullOrEmpty(output.Input.FileContent))
+          {
+            var inputContent = new StringBuilder();
+            inputContent.AppendLine("```");
+            inputContent.AppendLine(output.Input.FileContent);
+            inputContent.AppendLine("```");
+            AppendExpandableBlock(sb, "input", inputContent.ToString());
+          }
+
+          var outputContent = new StringBuilder();
+          outputContent.AppendLine("```");
+          outputContent.AppendLine(output.OutputContent);
+          outputContent.AppendLine("```");
+          AppendExpandableBlock(sb, "output", outputContent.ToString());
+        }
+      }
     }
 
     internal static void AppendAnalysisIssue(StringBuilder sb, string header, string issueText)
@@ -105,12 +137,12 @@ namespace HomeworkCheckerLib
       if (string.IsNullOrEmpty(issueText))
         return;
 
-      var timmedIssueText = issueText.Trim('\r', '\n');
+      var trimmedIssueText = issueText.Trim('\r', '\n');
 
       sb.AppendLine("## " + header);
       sb.AppendLine();
       sb.AppendLine("```");
-      sb.AppendLine(timmedIssueText);
+      sb.AppendLine(trimmedIssueText);
       sb.AppendLine("```");
       sb.AppendLine();
     }
