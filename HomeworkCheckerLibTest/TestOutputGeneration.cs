@@ -19,7 +19,7 @@ namespace HomeworkCheckerLibTest
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
-      output.Should().Be(new OutputGenerator.Output("output content", false));
+      output.Should().Be(new OutputGenerator.Output(0, "output content", false));
     }
 
     [Fact]
@@ -27,12 +27,12 @@ namespace HomeworkCheckerLibTest
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(a => a.Execute("java", "workingDir", "fileName", "inputContent", 5000))
-                     .Returns(new IAppExecuter.ExecutionResult(0, "output content", true));
+                     .Returns(new IAppExecuter.ExecutionResult(1, "output content", true));
       var sut = new OutputGenerator(appExecuterMock.Object);
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
-      output.Should().Be(new OutputGenerator.Output("output content", true));
+      output.Should().Be(new OutputGenerator.Output(1, "output content", true));
     }
 
     [Fact]
@@ -45,7 +45,7 @@ namespace HomeworkCheckerLibTest
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"));
 
-      output.Should().Be(new OutputGenerator.Output("output content", false));
+      output.Should().Be(new OutputGenerator.Output(0, "output content", false));
     }
 
     [Fact]
