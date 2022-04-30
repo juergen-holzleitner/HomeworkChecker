@@ -44,11 +44,11 @@ namespace HomeworkCheckerLibTest
     [Fact]
     public void Can_get_jplag_similarities()
     {
-      var jplagOutput = "Comparing \"file³\" - \"fileB\": 50.23";
+      var jplagOutput = "Comparing \"file³÷ⁿ╓\" - \"fileB\": 50.23";
 
       var result = JplagProcessor.GetSimilarities(jplagOutput);
 
-      result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileü", "fileB", 50.23) });
+      result.Should().Equal(new List<JplagProcessor.JplagSimilarity> { new("fileüöüÖ", "fileB", 50.23) });
     }
 
     [Theory]

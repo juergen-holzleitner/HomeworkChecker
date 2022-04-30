@@ -37,7 +37,9 @@ namespace HomeworkCheckerLib
     {
       javaOutput = javaOutput.Replace("÷", "ö");
       javaOutput = javaOutput.Replace("³", "ü");
+      javaOutput = javaOutput.Replace("ⁿ", "ü");
       javaOutput = javaOutput.Replace("Í", "Ö");
+      javaOutput = javaOutput.Replace("╓", "Ö");
 
       return javaOutput;
     }
