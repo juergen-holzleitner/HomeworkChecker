@@ -47,9 +47,12 @@ namespace HomeworkCheckerLib
           var linePercentage = GetPercentageFromLine(outputName, lineNumber, line) ?? 0;
           totalPercentage += linePercentage;
 
-          previousTotalPercentageValue = GetTotalPercentageValue(line);
-          if (previousTotalPercentageValue.HasValue)
+          var percentageValue = GetTotalPercentageValue(line);
+          if (percentageValue.HasValue)
+          {
             totalPercentageLine = lineNumber;
+            previousTotalPercentageValue = percentageValue;
+          }
 
           if (!string.IsNullOrEmpty(line))
             lastNonEmptyLine = lineNumber;
