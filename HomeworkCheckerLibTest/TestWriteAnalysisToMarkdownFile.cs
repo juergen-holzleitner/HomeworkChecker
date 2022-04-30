@@ -84,7 +84,7 @@ compile error
         s.Contains("<<<compile>>>")
         && s.Contains("filename problems")
         && s.Contains("duplicate problems")
-        && s.Contains("output problems")
+        && s.Contains("output analysis")
         && s.Contains("inputFile.txt")
         && s.Contains("input content")
         && s.Contains("outputcontent")
@@ -188,7 +188,38 @@ filePath2.java (WhitespaceDifferences)
 
       MarkdownGenerator.AppendOutputDifferences(sb, outputDifference);
 
-      sb.ToString().Should().StartWith("## output problems");
+      sb.ToString().Should().Be(@"## output analysis
+
+<details>
+  <summary><span style=""color:Red;font-weight:bold;"">output for inputFile.txt differs</span></summary>
+
+<details>
+  <summary>Click to expand input</summary>
+
+```
+input content
+```
+
+</details>
+
+<pre><code><del style=""color:Red;font-weight:bold;"">C</del><ins style=""color:DarkGreen;font-weight:bold;"">c</ins><span>ode</span></code></pre>
+<details>
+  <summary>Click to expand output</summary>
+
+expected
+```
+ouputcontent
+```
+actual
+```
+ouput content
+```
+
+</details>
+
+</details>
+
+");
     }
 
     [Fact]

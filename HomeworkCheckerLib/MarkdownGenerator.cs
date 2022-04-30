@@ -172,16 +172,15 @@ namespace HomeworkCheckerLib
 
     internal static void AppendOutputDifferences(StringBuilder sb, OutputDifferencesAnalyzer.OutputDifferenceAnalysis outputDifference)
     {
-      var differentOutputs = outputDifference.Differences.Where(d => d.DifferenceType != OutputDifferencesAnalyzer.DifferenceType.Equal);
-      if (!differentOutputs.Any())
-        return;
-
-      sb.AppendLine("## output problems");
+      sb.AppendLine("## output analysis");
       sb.AppendLine();
 
-      foreach (var diff in differentOutputs)
+      foreach (var diff in outputDifference.Differences)
       {
-        sb.AppendLine($"output for {diff.SubmissionOutput.Input.Filename} differs");
+        sb.AppendLine("<details>");
+        var headLine = diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal ? $"output for {diff.SubmissionOutput.Input.Filename} is good" : $"output for {diff.SubmissionOutput.Input.Filename} differs";
+        headLine = diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal ? $"<span style=\"color:DarkGreen;\">{headLine}</span>" : $"<span style=\"color:Red;font-weight:bold;\">{headLine}</span>";
+        sb.AppendLine($"  <summary>{headLine}</summary>");
         sb.AppendLine();
 
         if (diff.SubmissionOutput.HasTimedOut)
@@ -199,21 +198,33 @@ namespace HomeworkCheckerLib
           AppendExpandableBlock(sb, "input", input.ToString());
         }
 
-        sb.Append("<pre><code>");
-        AppendHtmlFromDiff(sb, diff.Difference.Diffs);
-        sb.AppendLine("</code></pre>");
+        if (diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal)
+        {
+          var output = new StringBuilder();
+          output.AppendLine("```");
+          output.AppendLine(diff.SubmissionOutput.OutputContent);
+          output.AppendLine("```");
+          AppendExpandableBlock(sb, "output", output.ToString());
+        }
+        else
+        {
+          sb.Append("<pre><code>");
+          AppendHtmlFromDiff(sb, diff.Difference.Diffs);
+          sb.AppendLine("</code></pre>");
 
-        var output = new StringBuilder();
-        output.AppendLine("expected");
-        output.AppendLine("```");
-        output.AppendLine(diff.MasterOutput.OutputContent);
-        output.AppendLine("```");
-        output.AppendLine("actual");
-        output.AppendLine("```");
-        output.AppendLine(diff.SubmissionOutput.OutputContent);
-        output.AppendLine("```");
-        AppendExpandableBlock(sb, "output", output.ToString());
-
+          var output = new StringBuilder();
+          output.AppendLine("expected");
+          output.AppendLine("```");
+          output.AppendLine(diff.MasterOutput.OutputContent);
+          output.AppendLine("```");
+          output.AppendLine("actual");
+          output.AppendLine("```");
+          output.AppendLine(diff.SubmissionOutput.OutputContent);
+          output.AppendLine("```");
+          AppendExpandableBlock(sb, "output", output.ToString());
+        }
+        
+        sb.AppendLine("</details>");
         sb.AppendLine();
       }
 
