@@ -222,6 +222,57 @@ ouput content
 ");
     }
 
+        [Fact]
+    public void Can_write_output_difference_with_whitespace_only()
+    {
+      var input = new HomeworkChecker.Input("inputFile.txt", "input content");
+      HomeworkChecker.Output masterOutput = new(input, 0, "ouputcontent", false);
+      HomeworkChecker.Output submissionOutput = new(input, 0, "ouput content", false);
+      var ouputDiffs = new List<DiffMatchPatch.Diff>()
+      {
+        new(DiffMatchPatch.Operation.DELETE, " "),
+      };
+      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.WhitespaceOnly, new TextDiffGenerator.Difference(ouputDiffs)) };
+      var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
+
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendOutputDifferences(sb, outputDifference);
+
+      sb.ToString().Should().Be(@"## output analysis
+
+<details>
+  <summary><span style=""color:Yellow;font-weight:bold;"">output for inputFile.txt differs (whitespace only)</span></summary>
+
+<details>
+  <summary>Click to expand input</summary>
+
+```
+input content
+```
+
+</details>
+
+<pre><code><del style=""color:Red;font-weight:bold;""> </del></code></pre>
+<details>
+  <summary>Click to expand output</summary>
+
+expected
+```
+ouputcontent
+```
+actual
+```
+ouput content
+```
+
+</details>
+
+</details>
+
+");
+    }
+
     [Fact]
     public void Can_generate_expandable_block()
     {

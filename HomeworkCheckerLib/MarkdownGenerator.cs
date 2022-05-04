@@ -179,7 +179,12 @@ namespace HomeworkCheckerLib
       {
         sb.AppendLine("<details>");
         var headLine = diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal ? $"output for {diff.SubmissionOutput.Input.Filename} is good" : $"output for {diff.SubmissionOutput.Input.Filename} differs";
-        headLine = diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal ? $"<span style=\"color:DarkGreen;\">{headLine}</span>" : $"<span style=\"color:Red;font-weight:bold;\">{headLine}</span>";
+        if (diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.Equal)
+          headLine = $"<span style=\"color:DarkGreen;\">{headLine}</span>";
+        else if (diff.DifferenceType == OutputDifferencesAnalyzer.DifferenceType.WhitespaceOnly)
+          headLine = $"<span style=\"color:Yellow;font-weight:bold;\">{headLine} (whitespace only)</span>";
+        else
+          headLine = $"<span style=\"color:Red;font-weight:bold;\">{headLine}</span>";
         sb.AppendLine($"  <summary>{headLine}</summary>");
         sb.AppendLine();
 
