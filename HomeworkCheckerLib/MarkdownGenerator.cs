@@ -259,6 +259,8 @@ namespace HomeworkCheckerLib
             isImportant = false;
           if (line.Contains("[ParenPad]"))
             isImportant = false;
+          if (line.Contains("[WhitespaceAfter]"))
+            isImportant = false;
 
           if (isImportant)
             result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");

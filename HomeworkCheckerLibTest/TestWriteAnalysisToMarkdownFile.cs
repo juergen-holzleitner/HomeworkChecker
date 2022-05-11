@@ -323,7 +323,8 @@ ouputcontent
     public void Can_generate_colored_checkstyle_output()
     {
       var checkstyleResult = @"[WARN] blabla [Important]
-[WARN] blabla whitespace [WhitespaceAround]";
+[WARN] blabla whitespace [WhitespaceAround]
+[WARN] blabla whitespace [WhitespaceAfter]";
       var sb = new StringBuilder();
 
       MarkdownGenerator.AppendCheckstyleIssue(sb, checkstyleResult);
@@ -331,7 +332,8 @@ ouputcontent
       sb.ToString().Should().Be(@"## checkstyle problems
 
 <pre><code><span style=""color:Yellow;font-weight:bold;"">[WARN] blabla [Important]</span>
-[WARN] blabla whitespace [WhitespaceAround]</code></pre>
+[WARN] blabla whitespace [WhitespaceAround]
+[WARN] blabla whitespace [WhitespaceAfter]</code></pre>
 
 ");
 
