@@ -98,7 +98,7 @@ namespace HomeworkCheckerLib
       AppendAnalysisIssue(sb, "Custom problems", analysisResult.CustomAnalysisIssues);
       AppendAnalysisIssue(sb, "SpotBugs problems", analysisResult.SpotBugsIssues);
       AppendAnalysisIssue(sb, "PMD problems", analysisResult.PMDIssues);
-      AppendAnalysisIssue(sb, "checkstyle problems", analysisResult.CheckstyleIssues);
+      AppendCheckstyleIssue(sb, analysisResult.CheckstyleIssues);
     }
 
     internal static void AppendOutputProblems(StringBuilder sb, IEnumerable<HomeworkChecker.Output> outputs)
@@ -141,9 +141,9 @@ namespace HomeworkCheckerLib
 
       sb.AppendLine("## " + header);
       sb.AppendLine();
-      sb.AppendLine("```");
-      sb.AppendLine(trimmedIssueText);
-      sb.AppendLine("```");
+      sb.Append("<pre><code>");
+      sb.Append(trimmedIssueText);
+      sb.AppendLine("</code></pre>");
       sb.AppendLine();
     }
 
@@ -243,6 +243,33 @@ namespace HomeworkCheckerLib
       sb.AppendLine(content);
       sb.AppendLine("</details>");
       sb.AppendLine();
+    }
+
+    internal static void AppendCheckstyleIssue(StringBuilder sb, string checkstyleResult)
+    {
+
+      var result = new StringBuilder();
+      using (var reader = new StringReader(checkstyleResult))
+      {
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+          bool isImportant = true;
+          if (line.Contains("[WhitespaceAround]"))
+            isImportant = false;
+          if (line.Contains("[ParenPad]"))
+            isImportant = false;
+
+          if (isImportant)
+            result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
+          result.Append(line);
+          if (isImportant)
+            result.Append(@"</span>");
+          result.AppendLine();
+        }
+      }
+
+      AppendAnalysisIssue(sb, "checkstyle problems", result.ToString());
     }
   }
 }

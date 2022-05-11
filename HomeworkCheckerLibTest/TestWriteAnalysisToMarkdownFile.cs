@@ -50,9 +50,7 @@ namespace HomeworkCheckerLibTest
       sb.ToString().Should().Be(
 @"## compile problems
 
-```
-compile error
-```
+<pre><code>compile error</code></pre>
 
 ");
     }
@@ -135,10 +133,8 @@ compile error
 
       sb.ToString().Should().Be(@"## duplicate problems
 
-```
-filePath.java (ExactCopy)
-filePath2.java (WhitespaceDifferences)
-```
+<pre><code>filePath.java (ExactCopy)
+filePath2.java (WhitespaceDifferences)</code></pre>
 
 ");
     }
@@ -321,6 +317,24 @@ ouputcontent
 </details>
 
 ");
+    }
+
+    [Fact]
+    public void Can_generate_colored_checkstyle_output()
+    {
+      var checkstyleResult = @"[WARN] blabla [Important]
+[WARN] blabla whitespace [WhitespaceAround]";
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendCheckstyleIssue(sb, checkstyleResult);
+
+      sb.ToString().Should().Be(@"## checkstyle problems
+
+<pre><code><span style=""color:Yellow;font-weight:bold;"">[WARN] blabla [Important]</span>
+[WARN] blabla whitespace [WhitespaceAround]</code></pre>
+
+");
+
     }
 
   }
