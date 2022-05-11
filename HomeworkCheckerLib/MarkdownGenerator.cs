@@ -213,10 +213,6 @@ namespace HomeworkCheckerLib
         }
         else
         {
-          sb.Append("<pre><code>");
-          AppendHtmlFromDiff(sb, diff.Difference.Diffs);
-          sb.AppendLine("</code></pre>");
-
           var output = new StringBuilder();
           output.AppendLine("expected");
           output.AppendLine("```");
@@ -227,8 +223,12 @@ namespace HomeworkCheckerLib
           output.AppendLine(diff.SubmissionOutput.OutputContent);
           output.AppendLine("```");
           AppendExpandableBlock(sb, "output", output.ToString());
+
+          sb.Append("<pre><code>");
+          AppendHtmlFromDiff(sb, diff.Difference.Diffs);
+          sb.AppendLine("</code></pre>");
         }
-        
+
         sb.AppendLine("</details>");
         sb.AppendLine();
       }

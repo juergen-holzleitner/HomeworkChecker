@@ -198,7 +198,6 @@ input content
 
 </details>
 
-<pre><code><del style=""color:Red;font-weight:bold;"">C</del><ins style=""color:DarkGreen;font-weight:bold;"">c</ins><span>ode</span></code></pre>
 <details>
   <summary>Click to expand output</summary>
 
@@ -213,6 +212,7 @@ ouput content
 
 </details>
 
+<pre><code><del style=""color:Red;font-weight:bold;"">C</del><ins style=""color:DarkGreen;font-weight:bold;"">c</ins><span>ode</span></code></pre>
 </details>
 
 ");
@@ -249,7 +249,6 @@ input content
 
 </details>
 
-<pre><code><del style=""color:Red;font-weight:bold;""> </del></code></pre>
 <details>
   <summary>Click to expand output</summary>
 
@@ -264,6 +263,7 @@ ouput content
 
 </details>
 
+<pre><code><del style=""color:Red;font-weight:bold;""> </del></code></pre>
 </details>
 
 ");
