@@ -14,7 +14,7 @@
       var workingDirectory = Path.GetDirectoryName(javaFilePath);
       var javaFile = Path.GetFileName(javaFilePath);
 
-      var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-Xlint -encoding UTF8 \"{javaFile}\"");
+      var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-g -Xlint -encoding UTF8 \"{javaFile}\"");
 
       return new(executeResult.ExitCode == 0, executeResult.Output);
     }
