@@ -18,7 +18,7 @@ namespace HomeworkCheckerLib
       var currentFolder = appExecuter.GetCurrentFolder();
       var result = appExecuter.Execute("cmd.exe", Path.Combine(currentFolder, "pmd", "bin"), $"/c pmd.bat -d \"{javaPath}\" -R Rules.xml -f text --short-names --no-cache -language java");
 
-      Trace.Assert(result.ExitCode == 0 || result.ExitCode == 4, $"PMD is not expected to return {result.ExitCode}");
+      Debug.Assert(result.ExitCode == 0 || result.ExitCode == 4, $"PMD is not expected to return {result.ExitCode}");
 
       return new(result.ExitCode, result.Output);
     }

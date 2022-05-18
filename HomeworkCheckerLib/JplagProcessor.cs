@@ -24,7 +24,7 @@ namespace HomeworkCheckerLib
       var workingFolder = Path.Combine(currentFolder, "jplag");
       var result = appExecuter.ExecuteAsciiOutput("java", workingFolder, $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{masterFolder}\" \"{homeworkFolder}\"");
 
-      Trace.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
+      Debug.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
 
       filesystemService.RemoveFolderIfExists(Path.Combine(workingFolder, jplagResultFolder));
 
