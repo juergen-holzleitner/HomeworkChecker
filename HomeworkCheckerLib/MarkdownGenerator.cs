@@ -93,7 +93,7 @@ namespace HomeworkCheckerLib
 
     private static void AppendFileAnalysisProblems(StringBuilder sb, HomeworkChecker.FileAnalysisResult analysisResult)
     {
-      AppendAnalysisIssue(sb, "compile problems", analysisResult.CompileIssues);
+      AppendCompileIssue(sb, analysisResult.CompileIssues);
       AppendOutputProblems(sb, analysisResult.Outputs);
       AppendCustomAnalyssisIssue(sb, analysisResult.CustomAnalysisIssues);
       AppendSpotBugsIssue(sb, analysisResult.SpotBugsIssues);
@@ -134,9 +134,6 @@ namespace HomeworkCheckerLib
 
     internal static void AppendAnalysisIssue(StringBuilder sb, string header, string issueText)
     {
-      if (string.IsNullOrEmpty(issueText))
-        return;
-
       var trimmedIssueText = issueText.Trim('\r', '\n');
 
       sb.AppendLine("## " + header);
@@ -247,6 +244,9 @@ namespace HomeworkCheckerLib
 
     internal static void AppendCheckstyleIssue(StringBuilder sb, string checkstyleResult)
     {
+      if (string.IsNullOrEmpty(checkstyleResult))
+        return;
+
       var result = new StringBuilder();
       using (var reader = new StringReader(checkstyleResult))
       {
@@ -279,6 +279,9 @@ namespace HomeworkCheckerLib
 
     internal static void AppendSpotBugsIssue(StringBuilder sb, string spotBugsResult)
     {
+      if (string.IsNullOrEmpty(spotBugsResult))
+        return;
+
       var result = new StringBuilder();
       result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
       result.Append(spotBugsResult);
@@ -288,6 +291,9 @@ namespace HomeworkCheckerLib
 
     internal static void AppendPMDIssue(StringBuilder sb, string pmdResult)
     {
+      if (string.IsNullOrEmpty(pmdResult))
+        return;
+
       var result = new StringBuilder();
       using (var reader = new StringReader(pmdResult))
       {
@@ -316,6 +322,9 @@ namespace HomeworkCheckerLib
 
     internal static void AppendCustomAnalyssisIssue(StringBuilder sb, string customAnalysisResult)
     {
+      if (string.IsNullOrEmpty(customAnalysisResult))
+        return;
+
       var result = new StringBuilder();
       result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
       result.Append(customAnalysisResult);
@@ -323,5 +332,16 @@ namespace HomeworkCheckerLib
       AppendAnalysisIssue(sb, "Custom problems", result.ToString());
     }
 
+    internal static void AppendCompileIssue(StringBuilder sb, string compileResult)
+    {
+      if (string.IsNullOrEmpty(compileResult))
+        return;
+
+      var result = new StringBuilder();
+      result.Append(@"<span style=""color:Red;font-weight:bold;"">");
+      result.Append(compileResult);
+      result.Append("</span>");
+      AppendAnalysisIssue(sb, "compile problems", result.ToString());
+    }
   }
 }

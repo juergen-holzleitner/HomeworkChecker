@@ -401,5 +401,22 @@ blablabla</span></code></pre>
 
     }
 
+    [Fact]
+    public void Can_generate_colored_Compile_output()
+    {
+      var compileResult = @"blabla
+blablabla";
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendCompileIssue(sb, compileResult);
+
+      sb.ToString().Should().Be(@"## compile problems
+
+<pre><code><span style=""color:Red;font-weight:bold;"">blabla
+blablabla</span></code></pre>
+
+");
+
+    }
   }
 }
