@@ -361,5 +361,27 @@ blablabla</span></code></pre>
 
     }
 
+    [Fact]
+    public void Can_generate_colored_PMD_output()
+    {
+      var pmdResult = @"UselessParentheses:	Useless parentheses.
+ForLoopCanBeForeach:	This for loop can be replaced by a foreach loop
+OnlyOneReturn:	A method should have only one exit point, and that should be the last statement in the method
+LocalVariableCouldBeFinal:	Local variable";
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendPMDIssue(sb, pmdResult);
+
+      sb.ToString().Should().Be(@"## PMD problems
+
+<pre><code><span style=""color:Yellow;font-weight:bold;"">UselessParentheses:	Useless parentheses.</span>
+ForLoopCanBeForeach:	This for loop can be replaced by a foreach loop
+OnlyOneReturn:	A method should have only one exit point, and that should be the last statement in the method
+LocalVariableCouldBeFinal:	Local variable</code></pre>
+
+");
+
+    }
+
   }
 }

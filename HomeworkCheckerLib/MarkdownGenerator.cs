@@ -97,7 +97,7 @@ namespace HomeworkCheckerLib
       AppendOutputProblems(sb, analysisResult.Outputs);
       AppendAnalysisIssue(sb, "Custom problems", analysisResult.CustomAnalysisIssues);
       AppendSpotBugsIssue(sb, analysisResult.SpotBugsIssues);
-      AppendAnalysisIssue(sb, "PMD problems", analysisResult.PMDIssues);
+      AppendPMDIssue(sb, analysisResult.PMDIssues);
       AppendCheckstyleIssue(sb, analysisResult.CheckstyleIssues);
     }
 
@@ -285,5 +285,34 @@ namespace HomeworkCheckerLib
       result.Append("</span>");
       AppendAnalysisIssue(sb, "SpotBugs problems", result.ToString());
     }
+
+    internal static void AppendPMDIssue(StringBuilder sb, string pmdResult)
+    {
+      var result = new StringBuilder();
+      using (var reader = new StringReader(pmdResult))
+      {
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+          bool isImportant = true;
+          if (line.Contains("ForLoopCanBeForeach:"))
+            isImportant = false;
+          if (line.Contains("OnlyOneReturn:"))
+            isImportant = false;
+          if (line.Contains("LocalVariableCouldBeFinal:"))
+            isImportant = false;
+
+          if (isImportant)
+            result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
+          result.Append(line);
+          if (isImportant)
+            result.Append(@"</span>");
+          result.AppendLine();
+        }
+      }
+
+      AppendAnalysisIssue(sb, "PMD problems", result.ToString());
+    }
+
   }
 }
