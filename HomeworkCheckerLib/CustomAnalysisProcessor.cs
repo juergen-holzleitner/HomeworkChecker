@@ -44,6 +44,8 @@ namespace HomeworkCheckerLib
         new (@"\s+[%\\]n", "space before newline"),
         new (@"\\n", "use of \\n instead of %n"),
         new (@"format\s*\(\s*""\s*[%\\]n\s*""\s*\)", "format is used to print a newline"),
+        new (@"\+=\s*1", "use of += instead of ++"),
+        new (@"\-=\s*1", "use of -= instead of --"),
 
       };
 

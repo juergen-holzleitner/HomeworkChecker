@@ -31,6 +31,8 @@ namespace HomeworkCheckerLibTest
     [InlineData("\\n", 1, "1: use of \\n instead of %n")]
     [InlineData("format(\"%n\")", 1, "1: format is used to print a newline")]
     [InlineData("\"X\"", 1, "1: use of string for a single character")]
+    [InlineData("x+= 1", 1, "1: use of += instead of ++")]
+    [InlineData("x -=1", 1, "1: use of -= instead of --")]
 
     public void Can_detect_custom_errors(string codeLine, int lineNumber, string expectedError)
     {
