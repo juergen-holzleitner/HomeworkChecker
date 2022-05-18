@@ -324,6 +324,8 @@ ouputcontent
     {
       var checkstyleResult = @"[WARN] blabla [Important]
 [WARN] blabla whitespace [WhitespaceAround]
+[WARN] blabla whitespace [MethodParamPad]
+[WARN] blabla whitespace [NoWhitespaceBefore]
 [WARN] blabla whitespace [WhitespaceAfter]";
       var sb = new StringBuilder();
 
@@ -333,6 +335,8 @@ ouputcontent
 
 <pre><code><span style=""color:Yellow;font-weight:bold;"">[WARN] blabla [Important]</span>
 [WARN] blabla whitespace [WhitespaceAround]
+[WARN] blabla whitespace [MethodParamPad]
+[WARN] blabla whitespace [NoWhitespaceBefore]
 [WARN] blabla whitespace [WhitespaceAfter]</code></pre>
 
 ");

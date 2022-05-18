@@ -261,6 +261,10 @@ namespace HomeworkCheckerLib
             isImportant = false;
           if (line.Contains("[WhitespaceAfter]"))
             isImportant = false;
+          if (line.Contains("[MethodParamPad]"))
+            isImportant = false;
+          if (line.Contains("[NoWhitespaceBefore]"))
+            isImportant = false;
 
           if (isImportant)
             result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
