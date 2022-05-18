@@ -343,5 +343,23 @@ ouputcontent
 
     }
 
+    [Fact]
+    public void Can_generate_colored_SpotBugs_output()
+    {
+      var spotBugsResult = @"blabla
+blablabla";
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendSpotBugsIssue(sb, spotBugsResult);
+
+      sb.ToString().Should().Be(@"## SpotBugs problems
+
+<pre><code><span style=""color:Yellow;font-weight:bold;"">blabla
+blablabla</span></code></pre>
+
+");
+
+    }
+
   }
 }
