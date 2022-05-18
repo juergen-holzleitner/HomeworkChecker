@@ -383,5 +383,23 @@ LocalVariableCouldBeFinal:	Local variable</code></pre>
 
     }
 
+    [Fact]
+    public void Can_generate_colored_CustomAnalysis_output()
+    {
+      var customAnalysisResult = @"blabla
+blablabla";
+      var sb = new StringBuilder();
+
+      MarkdownGenerator.AppendCustomAnalyssisIssue(sb, customAnalysisResult);
+
+      sb.ToString().Should().Be(@"## Custom problems
+
+<pre><code><span style=""color:Yellow;font-weight:bold;"">blabla
+blablabla</span></code></pre>
+
+");
+
+    }
+
   }
 }

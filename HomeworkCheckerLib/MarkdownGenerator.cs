@@ -95,7 +95,7 @@ namespace HomeworkCheckerLib
     {
       AppendAnalysisIssue(sb, "compile problems", analysisResult.CompileIssues);
       AppendOutputProblems(sb, analysisResult.Outputs);
-      AppendAnalysisIssue(sb, "Custom problems", analysisResult.CustomAnalysisIssues);
+      AppendCustomAnalyssisIssue(sb, analysisResult.CustomAnalysisIssues);
       AppendSpotBugsIssue(sb, analysisResult.SpotBugsIssues);
       AppendPMDIssue(sb, analysisResult.PMDIssues);
       AppendCheckstyleIssue(sb, analysisResult.CheckstyleIssues);
@@ -312,6 +312,15 @@ namespace HomeworkCheckerLib
       }
 
       AppendAnalysisIssue(sb, "PMD problems", result.ToString());
+    }
+
+    internal static void AppendCustomAnalyssisIssue(StringBuilder sb, string customAnalysisResult)
+    {
+      var result = new StringBuilder();
+      result.Append(@"<span style=""color:Yellow;font-weight:bold;"">");
+      result.Append(customAnalysisResult);
+      result.Append("</span>");
+      AppendAnalysisIssue(sb, "Custom problems", result.ToString());
     }
 
   }
