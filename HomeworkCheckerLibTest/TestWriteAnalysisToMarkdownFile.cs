@@ -133,8 +133,8 @@ namespace HomeworkCheckerLibTest
 
       sb.ToString().Should().Be(@"## duplicate problems
 
-<pre><code>filePath.java (ExactCopy)
-filePath2.java (WhitespaceDifferences)</code></pre>
+<pre><code><span style=""color:Yellow;font-weight:bold;"">filePath.java (ExactCopy)
+filePath2.java (WhitespaceDifferences)</span></code></pre>
 
 ");
     }

@@ -36,7 +36,8 @@ namespace HomeworkCheckerLib
         return;
 
       var d = duplicates.Select(d => $"{GenerateShortFileName(d.FilePath, baseFolder)} ({d.SimilarityMode})");
-      AppendAnalysisIssue(sb, "duplicate problems", string.Join(Environment.NewLine, d));
+      var duplicateString = "<span style=\"color:Yellow;font-weight:bold;\">" + string.Join(Environment.NewLine, d) + "</span>";
+      AppendAnalysisIssue(sb, "duplicate problems", duplicateString);
     }
     
     private static string GenerateShortFileName(string javaFile, string baseFolder)
