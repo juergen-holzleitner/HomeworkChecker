@@ -21,7 +21,7 @@ namespace HomeworkCheckerLib
 
       AppendDuplicateIssues(sb, analysisResult.Similarities.Duplicates, baseFolder);
 
-      AppendJplagSimilarities(sb, analysisResult.Similarities.JplagSimilarities, analysisResult.Similarities.JplagMasterSimilarity, baseFolder);
+      AppendJplagSimilarities(sb, analysisResult.Similarities.JplagSimilarities, analysisResult.Similarities.JplagSolutionSimilarity, baseFolder);
 
       AppendOutputDifferences(sb, analysisResult.OutputDifference);
 
@@ -46,17 +46,17 @@ namespace HomeworkCheckerLib
       return outputName;
     }
 
-    internal static void AppendJplagSimilarities(StringBuilder sb, IEnumerable<JplagProcessor.SubmissionSimilarity> jplagSimilarities, JplagProcessor.SubmissionSimilarity? masterSimilarity, string baseFolder)
+    internal static void AppendJplagSimilarities(StringBuilder sb, IEnumerable<JplagProcessor.SubmissionSimilarity> jplagSimilarities, JplagProcessor.SubmissionSimilarity? solutionSimilarity, string baseFolder)
     {
-      if (!jplagSimilarities.Any() && masterSimilarity is null)
+      if (!jplagSimilarities.Any() && solutionSimilarity is null)
         return;
 
       sb.AppendLine("## Jplag similarities");
       sb.AppendLine();
 
-      if (masterSimilarity is not null)
+      if (solutionSimilarity is not null)
       {
-        sb.AppendLine($"* similarity with master: **{masterSimilarity.Similarity}**");
+        sb.AppendLine($"* similarity with solution: **{solutionSimilarity.Similarity}**");
         sb.AppendLine();
       }
 
@@ -214,7 +214,7 @@ namespace HomeworkCheckerLib
           var output = new StringBuilder();
           output.AppendLine("expected");
           output.AppendLine("```");
-          output.AppendLine(diff.MasterOutput.OutputContent);
+          output.AppendLine(diff.SolutionOutput.OutputContent);
           output.AppendLine("```");
           output.AppendLine("actual");
           output.AppendLine("```");

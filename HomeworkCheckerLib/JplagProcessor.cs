@@ -16,13 +16,13 @@ namespace HomeworkCheckerLib
       this.filesystemService = filesystemService;
     }
 
-    internal JplagResult Process(string masterFolder, string homeworkFolder)
+    internal JplagResult Process(string solutionFolder, string homeworkFolder)
     {
       const string jplagResultFolder = "TEMP-jplag-result";
 
       var currentFolder = appExecuter.GetCurrentFolder();
       var workingFolder = Path.Combine(currentFolder, "jplag");
-      var result = appExecuter.ExecuteAsciiOutput("java", workingFolder, $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{masterFolder}\" \"{homeworkFolder}\"");
+      var result = appExecuter.ExecuteAsciiOutput("java", workingFolder, $"-jar jplag-4.0.0-SNAPSHOT-jar-with-dependencies.jar -m 100 -t 4 -r \"{jplagResultFolder}\" \"{solutionFolder}\" \"{homeworkFolder}\"");
 
       Debug.Assert(result.ExitCode == 0, $"jplag is not expected to return {result.ExitCode}");
 

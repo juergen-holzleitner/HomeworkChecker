@@ -62,15 +62,15 @@ namespace HomeworkCheckerLibTest
       var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 0, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
       var duplicates = new List<DuplicateFileAnalyzer.Similarity> { new("outputFolder\\file", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences) };
       var jplagSimilarities = new List<JplagProcessor.SubmissionSimilarity>();
-      var similarities = new HomeworkChecker.SimilarityAnalysis(duplicates, jplagSimilarities, new("Master.java", 99));
+      var similarities = new HomeworkChecker.SimilarityAnalysis(duplicates, jplagSimilarities, new("Solution.java", 99));
       var fileNameDiffs = new List<DiffMatchPatch.Diff>() { new(DiffMatchPatch.Operation.INSERT, "xxx"), new(DiffMatchPatch.Operation.DELETE, "java") };
       var filenameDifferences = new TextDiffGenerator.Difference(fileNameDiffs);
       var fileNameAnalysis = new HomeworkChecker.FileNameAnalysis("java", "xxx", new(fileNameDiffs));
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, 0, "outputcontent", false);
+      HomeworkChecker.Output solutionOutput = new(input, 0, "outputcontent", false);
       HomeworkChecker.Output submissionOutput = new(input, 0, "output content", false);
       var ouputDiffs = fileNameDiffs;
-      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
+      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(solutionOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
       var submissionAnalysis = new HomeworkChecker.SubmissionAnalysis(similarities, fileNameAnalysis, outputDifference, analysisResult);
       var homeworkResult = new HomeworkChecker.HomeworkResult(analysisResult, "outputFolder", new List<HomeworkChecker.SubmissionAnalysis> { submissionAnalysis });
@@ -148,14 +148,14 @@ filePath2.java (WhitespaceDifferences)</span></code></pre>
         new JplagProcessor.SubmissionSimilarity("homeworkFolder\\fileB.java", 100),
         new JplagProcessor.SubmissionSimilarity("homeworkFolder\\fileC.java", 50),
       };
-      var masterSimilarity = new JplagProcessor.SubmissionSimilarity("Master.java", 53.0);
+      var solutionSimilarity = new JplagProcessor.SubmissionSimilarity("Solution.java", 53.0);
       var sb = new StringBuilder();
 
-      MarkdownGenerator.AppendJplagSimilarities(sb, jplagSimilarities, masterSimilarity, "homeworkFolder");
+      MarkdownGenerator.AppendJplagSimilarities(sb, jplagSimilarities, solutionSimilarity, "homeworkFolder");
 
       sb.ToString().Should().Be(@"## Jplag similarities
 
-* similarity with master: **53**
+* similarity with solution: **53**
 
 * similar files
 	1. fileB.java: 100
@@ -169,7 +169,7 @@ filePath2.java (WhitespaceDifferences)</span></code></pre>
     public void Can_write_output_differences()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, 0, "ouputcontent", false);
+      HomeworkChecker.Output solutionOutput = new(input, 0, "ouputcontent", false);
       HomeworkChecker.Output submissionOutput = new(input, 0, "ouput content", false);
       var ouputDiffs = new List<DiffMatchPatch.Diff>()
       {
@@ -177,7 +177,7 @@ filePath2.java (WhitespaceDifferences)</span></code></pre>
         new(DiffMatchPatch.Operation.INSERT, "c"),
         new(DiffMatchPatch.Operation.EQUAL, "ode")
       };
-      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
+      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(solutionOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.Different, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
 
       var sb = new StringBuilder();
@@ -222,13 +222,13 @@ ouput content
     public void Can_write_output_difference_with_whitespace_only()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      HomeworkChecker.Output masterOutput = new(input, 0, "ouputcontent", false);
+      HomeworkChecker.Output solutionOutput = new(input, 0, "ouputcontent", false);
       HomeworkChecker.Output submissionOutput = new(input, 0, "ouput content", false);
       var ouputDiffs = new List<DiffMatchPatch.Diff>()
       {
         new(DiffMatchPatch.Operation.DELETE, " "),
       };
-      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(masterOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.WhitespaceOnly, new TextDiffGenerator.Difference(ouputDiffs)) };
+      var outputDifferences = new List<OutputDifferencesAnalyzer.OutputDifference> { new OutputDifferencesAnalyzer.OutputDifference(solutionOutput, submissionOutput, OutputDifferencesAnalyzer.DifferenceType.WhitespaceOnly, new TextDiffGenerator.Difference(ouputDiffs)) };
       var outputDifference = new OutputDifferencesAnalyzer.OutputDifferenceAnalysis(outputDifferences);
 
       var sb = new StringBuilder();

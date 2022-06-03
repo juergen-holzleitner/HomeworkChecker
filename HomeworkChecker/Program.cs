@@ -6,14 +6,14 @@
     {
       if (args.Length < 1)
       {
-        Console.WriteLine("USAGE: HomeworkChecker.exe <master folder> [<homework folder>]");
+        Console.WriteLine("USAGE: HomeworkChecker.exe <solution folder> [<homework folder>]");
         Console.WriteLine("USAGE: HomeworkChecker.exe --evaluateOnly <homework folder>");
         return;
       }
 
       if (args.Length == 1)
       {
-        ProcessMaster(args[0]);
+        ProcessSolution(args[0]);
       }
       else
       {
@@ -28,10 +28,10 @@
       }
     }
 
-    private static void ProcessHomeworks(string masterFolder, string homeworkFolder)
+    private static void ProcessHomeworks(string solutionFolder, string homeworkFolder)
     {
       var homeworkChecker = new HomeworkCheckerLib.HomeworkChecker();
-      var analysisResult = homeworkChecker.ProcessHomework(masterFolder, homeworkFolder);
+      var analysisResult = homeworkChecker.ProcessHomework(solutionFolder, homeworkFolder);
       homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
 
       if (homeworkChecker.StartVSCodeWithFolder(homeworkFolder) == 0)
@@ -47,12 +47,12 @@
       percentageAdder.ProcessPercentages(homeworkFolder);
     }
 
-    private static void ProcessMaster(string masterFolder)
+    private static void ProcessSolution(string solutionFolder)
     {
       var homeworkChecker = new HomeworkCheckerLib.HomeworkChecker();
-      var analysisResult = homeworkChecker.ProcessMaster(masterFolder);
+      var analysisResult = homeworkChecker.ProcessSolution(solutionFolder);
       homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
-      if (homeworkChecker.StartVSCodeWithFolder(masterFolder) == 0)
+      if (homeworkChecker.StartVSCodeWithFolder(solutionFolder) == 0)
         homeworkChecker.CleanUpMarkdownFiles(analysisResult);
     }
   }

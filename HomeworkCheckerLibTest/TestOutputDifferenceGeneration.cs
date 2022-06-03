@@ -14,13 +14,13 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> solutionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
       IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouput content", false) };
 
-      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
+      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(solutionOutput, submissionOutput);
 
       var diff = differenceAnalysis.Differences.Single();
-      diff.MasterOutput.Should().Be(masterOutput.Single());
+      diff.SolutionOutput.Should().Be(solutionOutput.Single());
       diff.SubmissionOutput.Should().Be(submissionOutput.Single());
       diff.DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.WhitespaceOnly);
       diff.Difference.Diffs.Should().NotBeEmpty();
@@ -30,13 +30,13 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences_of_equal_files()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> solutionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
       IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
 
-      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
+      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(solutionOutput, submissionOutput);
 
       var diff = differenceAnalysis.Differences.Single();
-      diff.MasterOutput.Should().Be(masterOutput.Single());
+      diff.SolutionOutput.Should().Be(solutionOutput.Single());
       diff.SubmissionOutput.Should().Be(submissionOutput.Single());
       diff.DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.Equal);
       diff.Difference.Diffs.Should().BeEmpty();
@@ -46,13 +46,13 @@ namespace HomeworkCheckerLibTest
     public void Can_generate_output_differences_of_different_files()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");
-      IEnumerable<HomeworkChecker.Output> masterOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
+      IEnumerable<HomeworkChecker.Output> solutionOutput = new List<HomeworkChecker.Output> { new(input, 0, "ouputcontent", false) };
       IEnumerable<HomeworkChecker.Output> submissionOutput = new List<HomeworkChecker.Output> { new(input, 0, "Xouputcontent", false) };
 
-      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(masterOutput, submissionOutput);
+      var differenceAnalysis = OutputDifferencesAnalyzer.GetDifferences(solutionOutput, submissionOutput);
 
       var diff = differenceAnalysis.Differences.Single();
-      diff.MasterOutput.Should().Be(masterOutput.Single());
+      diff.SolutionOutput.Should().Be(solutionOutput.Single());
       diff.SubmissionOutput.Should().Be(submissionOutput.Single());
       diff.DifferenceType.Should().Be(OutputDifferencesAnalyzer.DifferenceType.Different);
       diff.Difference.Diffs.Should().HaveCount(2);
@@ -64,11 +64,11 @@ namespace HomeworkCheckerLibTest
     public void Do_not_call_output_generation_if_compile_failed()
     {
       var appExecuterMock = new Mock<IAppExecuter>();
-      appExecuterMock.Setup(x => x.Execute("javac", "masterFolder", It.IsAny<string>()))
+      appExecuterMock.Setup(x => x.Execute("javac", "solutionFolder", It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, string.Empty, false));
       appExecuterMock.Setup(x => x.Execute("javac", "homeworkFolder", It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(-1, "compile failed", false));
-      appExecuterMock.Setup(x => x.Execute("java", "masterFolder", "HomeworkFile", It.IsAny<string>(), It.IsAny<int>()))
+      appExecuterMock.Setup(x => x.Execute("java", "solutionFolder", "HomeworkFile", It.IsAny<string>(), It.IsAny<int>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "1", true));
       appExecuterMock.Setup(x => x.Execute("java", "homeworkFolder", "homeworkFile", It.IsAny<string>(), It.IsAny<int>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "1", true));
@@ -80,13 +80,13 @@ namespace HomeworkCheckerLibTest
       appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "spotbugs", "lib"), It.IsAny<string>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "SpotBugs content", true));
       appExecuterMock.Setup(x => x.ExecuteAsciiOutput("java", Path.Combine("currentFolder", "jplag"), It.IsAny<string>()))
-                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"masterFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75\r\nComparing \"homeworkFolder2\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
+                     .Returns(new IAppExecuter.ExecutionResult(0, "Comparing \"solutionFolder\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75\r\nComparing \"homeworkFolder2\\HomeworkFile.java\" - \"homeworkFolder\\homeworkFile.java\": 75", false));
 
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
-        f => f.GetFilesInFolderRecursivly("masterFolder", "*.java"))
-        .Returns(new List<string> { @"masterFolder\HomeworkFile.java" });
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@"masterFolder\HomeworkFile.java")).Returns("printf");
+        f => f.GetFilesInFolderRecursivly("solutionFolder", "*.java"))
+        .Returns(new List<string> { @"solutionFolder\HomeworkFile.java" });
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@"solutionFolder\HomeworkFile.java")).Returns("printf");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@"homeworkFolder\homeworkFile.java")).Returns("printf");
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("homeworkFolder", "*.java"))
@@ -96,7 +96,7 @@ namespace HomeworkCheckerLibTest
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, appExecuterMock.Object, outputMock.Object);
 
-      var result = sut.ProcessHomework("masterFolder", "homeworkFolder");
+      var result = sut.ProcessHomework("solutionFolder", "homeworkFolder");
 
       outputMock.Verify(o => o.WriteError("compiling homeworkFile.java failed"));
       appExecuterMock.Verify(x => x.Execute("java", "homeworkFolder", "homeworkFile", It.IsAny<string>(), It.IsAny<int>()), Times.Never);
