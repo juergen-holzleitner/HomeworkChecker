@@ -6,7 +6,8 @@
     {
       if (args.Length < 1)
       {
-        Console.WriteLine("USAGE: HomeworkChecker.exe <master folder> [<homework folder>] ");
+        Console.WriteLine("USAGE: HomeworkChecker.exe <master folder> [<homework folder>]");
+        Console.WriteLine("USAGE: HomeworkChecker.exe --evaluateOnly <homework folder>");
         return;
       }
 
@@ -20,14 +21,22 @@
       }
       else
       {
-        var analysisResult = homeworkChecker.ProcessHomework(args[0], args[1]);
-        homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
-
-        if (homeworkChecker.StartVSCodeWithFolder(args[1]) == 0)
+        if (args[0] == "--evaluateOnly")
         {
-          homeworkChecker.CleanUpMarkdownFiles(analysisResult);
           var percentageAdder = new HomeworkCheckerLib.PercentageAdder();
-          percentageAdder.ProcessPercentages(analysisResult.SubmissionBaseFolder);
+          percentageAdder.ProcessPercentages(args[1]);
+        }
+        else
+        {
+          var analysisResult = homeworkChecker.ProcessHomework(args[0], args[1]);
+          homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
+
+          if (homeworkChecker.StartVSCodeWithFolder(args[1]) == 0)
+          {
+            homeworkChecker.CleanUpMarkdownFiles(analysisResult);
+            var percentageAdder = new HomeworkCheckerLib.PercentageAdder();
+            percentageAdder.ProcessPercentages(analysisResult.SubmissionBaseFolder);
+          }
         }
       }
     }
