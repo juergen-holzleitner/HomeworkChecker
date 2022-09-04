@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiffMatchPatch" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="checkstyle\checkstyle-10.2-all.jar">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

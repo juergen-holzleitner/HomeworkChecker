@@ -9,9 +9,9 @@
       if (oldText == newText)
         return new(new());
 
-      var dmp = new DiffMatchPatch.Diff_match_patch();
-      var diffs = dmp.Diff_main(oldText, newText, false);
-      dmp.Diff_cleanupSemantic(diffs);
+      var dmp = new DiffMatchPatch.diff_match_patch();
+      var diffs = dmp.diff_main(oldText, newText, false);
+      dmp.diff_cleanupSemantic(diffs);
 
       return new Difference(diffs);
     }
