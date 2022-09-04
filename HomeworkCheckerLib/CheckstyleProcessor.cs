@@ -16,7 +16,7 @@ namespace HomeworkCheckerLib
     internal CheckstyleResult Process(string javaPath)
     {
       var currentFolder = appExecuter.GetCurrentFolder();
-      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "checkstyle"), $"-jar \"checkstyle-10.2-all.jar\" -c google_checks_modified.xml \"{javaPath}\"");
+      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "checkstyle"), $"-jar \"checkstyle-10.3.3-all.jar\" -c google_checks_modified.xml \"{javaPath}\"");
 
       Debug.Assert(result.ExitCode == 0, $"checkstyle is not expected to return {result.ExitCode}");
 
