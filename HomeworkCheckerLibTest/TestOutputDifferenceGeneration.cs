@@ -98,7 +98,7 @@ namespace HomeworkCheckerLibTest
 
       var result = sut.ProcessHomework("solutionFolder", "homeworkFolder");
 
-      outputMock.Verify(o => o.WriteError("compiling homeworkFile.java failed"));
+      outputMock.Verify(o => o.WriteError("compiling homeworkFolder failed"));
       appExecuterMock.Verify(x => x.Execute("java", "homeworkFolder", "homeworkFile", It.IsAny<string>(), It.IsAny<int>()), Times.Never);
     }
   }

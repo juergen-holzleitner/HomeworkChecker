@@ -14,7 +14,7 @@ namespace HomeworkCheckerLibTest
     public void Can_write_analysis_to_markdown()
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
-      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 1, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
+      var analysisResult = new HomeworkChecker.FileAnalysisResult(new List<string> { @"outputFolder\someFile.java" }, "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 1, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());
 
       sut.WriteAnalysisToMarkdownFile(analysisResult);
@@ -59,7 +59,7 @@ namespace HomeworkCheckerLibTest
     public void Can_write_submission_analysis_to_markdown()
     {
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
-      var analysisResult = new HomeworkChecker.FileAnalysisResult(@"outputFolder\someFile.java", "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 0, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
+      var analysisResult = new HomeworkChecker.FileAnalysisResult(new List<string> { @"outputFolder\someFile.java" }, "<<<compile>>>", new List<HomeworkChecker.Output> { new(new("inputfile", "<<<input>>>"), 0, "<<<output>>>", false) }, "<<<checkstyle>>>", "<<<PMD>>>", "<<<SpotBugs>>>", "<<<custom>>>");
       var duplicates = new List<DuplicateFileAnalyzer.Similarity> { new("outputFolder\\file", DuplicateFileAnalyzer.SimilarityMode.WhitespaceDifferences) };
       var jplagSimilarities = new List<JplagProcessor.SubmissionSimilarity>();
       var similarities = new HomeworkChecker.SimilarityAnalysis(duplicates, jplagSimilarities, new("Solution.java", 99));

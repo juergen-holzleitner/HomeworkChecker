@@ -48,7 +48,7 @@ namespace HomeworkCheckerLibTest
 
       var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
       var outputSequence = new MockSequence();
-      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing someFile.java"));
+      outputMock.InSequence(outputSequence).Setup(o => o.WriteInfo("processing arbitraryFolder"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("compiled"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteSuccess("generated output for 0"));
       outputMock.InSequence(outputSequence).Setup(o => o.WriteError("generation of output for 1 timed out"));
@@ -63,7 +63,7 @@ namespace HomeworkCheckerLibTest
       var result = sut.ProcessSolution(solutionFolder);
 
       var expectedSolutionFile = Path.Combine(@"arbitraryFolder", @"someFile.java");
-      result.FileName.Should().Be(Path.Combine(expectedSolutionFile));
+      result.FileNames.Should().BeEquivalentTo(new[] { expectedSolutionFile });
       result.CompileIssues.Should().BeEmpty();
 
       result.Outputs.Should().Equal(new List<HomeworkChecker.Output>
@@ -120,12 +120,12 @@ namespace HomeworkCheckerLibTest
 
       outputMock.Verify(o => o.WriteInfo(System.Environment.NewLine), Times.Exactly(3));
       outputMock.Verify(o => o.WriteWarning("processed jplag with 2 result(s), but 3 were expected"));
-      outputMock.Verify(o => o.WriteInfo("processing homeworkFile.java"));
-      outputMock.Verify(o => o.WriteInfo("processing HomeworkFile.java"));
+      outputMock.Verify(o => o.WriteInfo("processing solutionFolder"));
+      outputMock.Verify(o => o.WriteInfo("processing homeworkFolder"));
       outputMock.Verify(o => o.WriteWarning("homeworkFile.java has 1 duplicate(s)"));
 
       result.Submissions.Should().HaveCount(2);
-      var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileName == "homeworkFolder\\homeworkFile.java").Single();
+      var homework1Submission = result.Submissions.Where(s => s.AnalysisResult.FileNames.Contains("homeworkFolder\\homeworkFile.java")).Single();
       homework1Submission.Similarities.Duplicates.Should().Equal(new DuplicateFileAnalyzer.Similarity(@"homeworkFolder2\HomeworkFile.java", DuplicateFileAnalyzer.SimilarityMode.ExactCopy));
       homework1Submission.Similarities.JplagSimilarities.Should().HaveCount(1);
       homework1Submission.Similarities.JplagSolutionSimilarity.Should().NotBeNull();
@@ -155,7 +155,7 @@ namespace HomeworkCheckerLibTest
       var outputMock = new Mock<IRuntimeOutput>();
       var filesystemMock = new Mock<FilesystemService.IFileEnumerator>();
       var sut = new HomeworkChecker(filesystemMock.Object, Mock.Of<IAppExecuter>(), outputMock.Object);
-      var fileAnalysisResult = new HomeworkChecker.FileAnalysisResult("someFolder\\someFile.java", string.Empty, Enumerable.Empty<HomeworkChecker.Output>(), string.Empty, string.Empty, string.Empty, string.Empty);
+      var fileAnalysisResult = new HomeworkChecker.FileAnalysisResult(new List<string> { "someFolder\\someFile.java" }, string.Empty, Enumerable.Empty<HomeworkChecker.Output>(), string.Empty, string.Empty, string.Empty, string.Empty);
 
       sut.CleanUpMarkdownFiles(fileAnalysisResult);
 

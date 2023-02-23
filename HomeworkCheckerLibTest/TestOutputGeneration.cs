@@ -57,7 +57,7 @@ namespace HomeworkCheckerLibTest
       var sut = new HomeworkChecker(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
       InputGenerator.InputData emptyInputData = new(new List<HomeworkChecker.Input>());
 
-      var outputs = sut.GetProgramOutputs(Path.Combine("solutionfolder", "program.java"), emptyInputData);
+      var outputs = sut.GetProgramOutputs(new List<string> { Path.Combine("solutionfolder", "program.java") }, emptyInputData);
 
       outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new("[no input]", string.Empty), 0, "output", false) });
     }

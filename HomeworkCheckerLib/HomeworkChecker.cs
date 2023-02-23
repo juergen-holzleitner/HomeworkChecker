@@ -6,7 +6,7 @@
 
     public record Output(Input Input, int ExitCode, string OutputContent, bool HasTimedOut);
 
-    public record FileAnalysisResult(string FileName, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
+    public record FileAnalysisResult(IEnumerable<string> FileNames, string CompileIssues, IEnumerable<Output> Outputs, string CheckstyleIssues, string PMDIssues, string SpotBugsIssues, string CustomAnalysisIssues);
 
     public record SimilarityAnalysis(IEnumerable<DuplicateFileAnalyzer.Similarity> Duplicates, IEnumerable<JplagProcessor.SubmissionSimilarity> JplagSimilarities, JplagProcessor.SubmissionSimilarity? JplagSolutionSimilarity);
 
@@ -46,15 +46,12 @@
 
     private FileAnalysisResult ProcessSolution(string solutionFolder, InputGenerator.InputData inputData)
     {
-      var javaFile = filesystemService.GetAllJavaFiles(solutionFolder).Single();
-      var outputName = javaFile[solutionFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-      return ProcessFileAnalysis(outputName, javaFile, inputData);
+      var javaFiles = filesystemService.GetAllJavaFiles(solutionFolder);
+      return ProcessFileAnalysis(solutionFolder, javaFiles, inputData);
     }
 
-    private FileAnalysisResult ProcessFileAnalysis(string outputName, string javaFile, InputGenerator.InputData inputData)
+    private FileAnalysisResult ProcessFileAnalysis(string outputName, IEnumerable<string> javaFiles, InputGenerator.InputData inputData)
     {
-      var javaFiles = new List<string>() { javaFile };
-
       output.WriteInfo($"processing {outputName}");
 
       var compileOutput = string.Empty;
@@ -70,7 +67,7 @@
       {
         output.WriteSuccess($"compiled");
 
-        outputs = GetProgramOutputs(javaFile, inputData).ToList();
+        outputs = GetProgramOutputs(javaFiles, inputData).ToList();
         foreach (var programOutput in outputs)
         {
           if (programOutput.HasTimedOut)
@@ -113,10 +110,13 @@
         spotBugsOutput = spotBugsResult.SpotBugsOutput;
       }
 
-      var classFile = Path.ChangeExtension(javaFile, "class");
-      filesystemService.RemoveFileIfExists(classFile);
+      foreach (var javaFile in javaFiles)
+      {
+        var classFile = Path.ChangeExtension(javaFile, "class");
+        filesystemService.RemoveFileIfExists(classFile);
+      }
 
-      return new(javaFile, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput, customAnalysisResult.CustomAnalysisOutput);
+      return new(javaFiles, compileOutput, outputs, checkstyleResult.CheckstyleOutput, pmdResult.PMDOutput, spotBugsOutput, customAnalysisResult.CustomAnalysisOutput);
     }
 
     public HomeworkResult ProcessHomework(string solutionFolder, string homeworkFolder)
@@ -124,7 +124,7 @@
       var inputData = inputGenerator.GetInputs(solutionFolder);
 
       var solutionResult = ProcessSolution(solutionFolder, inputData);
-      var solutionFileName = Path.GetFileName(solutionResult.FileName);
+      var solutionFileName = Path.GetFileName(solutionResult.FileNames.First());
 
       var homeworkFiles = filesystemService.GetAllJavaFiles(homeworkFolder);
 
@@ -140,7 +140,7 @@
       else
         output.WriteSuccess($"processed jplag with {numResults} result(s)");
 
-      var possibleDuplicateFiles = Enumerable.Append(homeworkFiles, solutionResult.FileName);
+      var possibleDuplicateFiles = Enumerable.Concat(homeworkFiles, solutionResult.FileNames);
 
       List<SubmissionAnalysis> submissions = new();
       foreach (var homeworkFile in homeworkFiles)
@@ -148,12 +148,12 @@
         output.WriteInfo(Environment.NewLine);
 
         var outputName = homeworkFile[homeworkFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var analysisResult = ProcessFileAnalysis(outputName, homeworkFile, inputData);
+        var analysisResult = ProcessFileAnalysis(homeworkFolder, new List<string> { homeworkFile }, inputData);
 
         var duplicateInfo = duplicateFileAnalyzer.ProcessAnalysis(homeworkFile, possibleDuplicateFiles);
         var jplagSimilarities = JplagProcessor.GetSubmissionSimilarities(homeworkFile, jplagResult.Similarities);
-        var solutionSimilarity = jplagSimilarities.Where(j => j.File == solutionResult.FileName).SingleOrDefault();
-        var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities.Where(j => j.File != solutionResult.FileName), solutionSimilarity);
+        var solutionSimilarity = jplagSimilarities.Where(j => solutionResult.FileNames.Contains(j.File)).SingleOrDefault();
+        var similarityAnalysis = new SimilarityAnalysis(duplicateInfo, jplagSimilarities.Where(j => !solutionResult.FileNames.Contains(j.File)), solutionSimilarity);
         if (duplicateInfo.Any())
           output.WriteWarning($"{outputName} has {duplicateInfo.Count()} duplicate(s)");
 
@@ -180,7 +180,7 @@
 
     public void WriteAnalysisToMarkdownFile(FileAnalysisResult analysisResult)
     {
-      var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.FileName)!, "NOTES.md");
+      var markdownFile = Path.Combine(Path.GetDirectoryName(analysisResult.FileNames.First())!, "NOTES.md");
       var markdownText = MarkdownGenerator.FromFileAnalysis(analysisResult);
       filesystemService.AppendMarkdown(markdownFile, markdownText);
     }
@@ -189,7 +189,7 @@
     {
       foreach (var analysis in analysisResult.Submissions)
       {
-        var markdownFile = Path.Combine(Path.GetDirectoryName(analysis.AnalysisResult.FileName)!, "NOTES.md");
+        var markdownFile = Path.Combine(Path.GetDirectoryName(analysis.AnalysisResult.FileNames.First())!, "NOTES.md");
         var markdownText = MarkdownGenerator.FromSubmissionAnalysis(analysis, analysisResult.SubmissionBaseFolder);
         filesystemService.AppendMarkdown(markdownFile, markdownText);
       }
@@ -212,7 +212,7 @@
 
     private void RemoveMarkdownFile(FileAnalysisResult fileAnalysisResult)
     {
-      var path = Path.GetDirectoryName(fileAnalysisResult.FileName)!;
+      var path = Path.GetDirectoryName(fileAnalysisResult.FileNames.First())!;
       filesystemService.RemoveFileIfExists(Path.Combine(path, "NOTES.md"));
     }
 
@@ -220,26 +220,29 @@
     {
       foreach (var submission in homeworkResult.Submissions)
       {
-        var path = Path.GetDirectoryName(submission.AnalysisResult.FileName)!;
+        var path = Path.GetDirectoryName(submission.AnalysisResult.FileNames.First())!;
         filesystemService.RemoveFileIfExists(Path.Combine(path, "NOTES.md"));
       }
       output.WriteInfo("NOTES.md cleared");
     }
 
-    internal IEnumerable<Output> GetProgramOutputs(string fileName, InputGenerator.InputData inputData)
+    internal IEnumerable<Output> GetProgramOutputs(IEnumerable<string> fileNames, InputGenerator.InputData inputData)
     {
-      if (inputData.Inputs.Any())
+      foreach (var fileName in fileNames)
       {
-        foreach (var input in inputData.Inputs)
+        if (inputData.Inputs.Any())
         {
-          var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
-          yield return new Output(input, output.ExitCode, output.Content, output.HasTimedOut);
+          foreach (var input in inputData.Inputs)
+          {
+            var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
+            yield return new Output(input, output.ExitCode, output.Content, output.HasTimedOut);
+          }
         }
-      }
-      else
-      {
-        var output = outputGenerator.GenerateOutput(fileName);
-        yield return new Output(new("[no input]", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
+        else
+        {
+          var output = outputGenerator.GenerateOutput(fileName);
+          yield return new Output(new("[no input]", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
+        }
       }
     }
 
