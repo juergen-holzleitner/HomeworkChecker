@@ -44,7 +44,7 @@ namespace HomeworkCheckerLibTest
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{solutionFolder}\0.txt")).Returns("1\n2\n3\n");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{solutionFolder}\1.txt")).Returns("1\n1\n1\n");
       fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{solutionFolder}\2.txt")).Returns("3\n2\n1\n");
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{solutionFolder}\someFile.java")).Returns("printf");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@$"{solutionFolder}\someFile.java")).Returns("main printf");
 
       var outputMock = new Mock<IRuntimeOutput>(MockBehavior.Strict);
       var outputSequence = new MockSequence();
@@ -90,8 +90,8 @@ namespace HomeworkCheckerLibTest
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("solutionFolder", "*.java"))
         .Returns(new List<string> { @"solutionFolder\HomeworkFile.java" });
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(@"solutionFolder\HomeworkFile.java")).Returns("solution source");
-      fileEnumeratorMock.Setup(f => f.ReadFileContent(It.Is<string>(s => s.StartsWith("homeworkFolder")))).Returns("homework source");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(@"solutionFolder\HomeworkFile.java")).Returns("solution source main");
+      fileEnumeratorMock.Setup(f => f.ReadFileContent(It.Is<string>(s => s.StartsWith("homeworkFolder")))).Returns("homework source main");
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly("homeworkFolder", "*.java"))
         .Returns(new List<string> { @"homeworkFolder\homeworkFile.java", @"homeworkFolder2\HomeworkFile.java" });

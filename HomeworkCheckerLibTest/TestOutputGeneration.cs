@@ -51,13 +51,17 @@ namespace HomeworkCheckerLibTest
     [Fact]
     public void Can_generate_homeworkChecker_output_without_input_files()
     {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+      fileEnumerator.Setup(x => x.ReadFileContent(@"solutionfolder\program.java")).Returns("public static void main(String[] args) {");
+      fileEnumerator.Setup(x => x.ReadFileContent(@"solutionfolder\Klazz.java")).Returns("public class Klazz");
+
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute("java", "solutionfolder", "program", null, It.IsAny<int>()))
                      .Returns(new IAppExecuter.ExecutionResult(0, "output", false));
-      var sut = new HomeworkChecker(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
+      var sut = new HomeworkChecker(fileEnumerator.Object, appExecuterMock.Object, Mock.Of<IRuntimeOutput>());
       InputGenerator.InputData emptyInputData = new(new List<HomeworkChecker.Input>());
 
-      var outputs = sut.GetProgramOutputs(new List<string> { Path.Combine("solutionfolder", "program.java") }, emptyInputData);
+      var outputs = sut.GetProgramOutputs(new List<string> { Path.Combine("solutionfolder", "program.java"), Path.Combine("solutionfolder", "Klazz.java") }, emptyInputData);
 
       outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new("[no input]", string.Empty), 0, "output", false) });
     }

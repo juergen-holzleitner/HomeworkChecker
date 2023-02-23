@@ -229,21 +229,22 @@
     internal IEnumerable<Output> GetProgramOutputs(IEnumerable<string> fileNames, InputGenerator.InputData inputData)
     {
       foreach (var fileName in fileNames)
-      {
-        if (inputData.Inputs.Any())
+        if (outputGenerator.IsRunnableViaMain(fileName))
         {
-          foreach (var input in inputData.Inputs)
+          if (inputData.Inputs.Any())
           {
-            var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
-            yield return new Output(input, output.ExitCode, output.Content, output.HasTimedOut);
+            foreach (var input in inputData.Inputs)
+            {
+              var output = outputGenerator.GenerateOutput(fileName, input.FileContent);
+              yield return new Output(input, output.ExitCode, output.Content, output.HasTimedOut);
+            }
+          }
+          else
+          {
+            var output = outputGenerator.GenerateOutput(fileName);
+            yield return new Output(new("[no input]", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
           }
         }
-        else
-        {
-          var output = outputGenerator.GenerateOutput(fileName);
-          yield return new Output(new("[no input]", string.Empty), output.ExitCode, output.Content, output.HasTimedOut);
-        }
-      }
     }
 
     readonly FilesystemService filesystemService;
