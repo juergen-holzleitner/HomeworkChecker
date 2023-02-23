@@ -60,7 +60,7 @@
       var compileOutput = string.Empty;
       IEnumerable<Output> outputs = Enumerable.Empty<Output>();
 
-      var compileResult = javaCompiler.CompileFile(javaFile);
+      var compileResult = javaCompiler.CompileFile(javaFiles);
       if (!compileResult.CompileSucceeded)
       {
         output.WriteError($"compiling {outputName} failed");

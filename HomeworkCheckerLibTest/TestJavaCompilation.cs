@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using HomeworkCheckerLib;
 using Moq;
+using System.Collections.Generic;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -16,8 +17,8 @@ namespace HomeworkCheckerLibTest
 
       var sut = new JavaCompiler(appExecuterMock.Object);
 
-      var result = sut.CompileFile(@"someFolder\someFileName.java");
-      appExecuterMock.Verify(x => x.Execute("javac", "someFolder", "-g -Xlint -encoding UTF8 \"someFileName.java\""), Times.Once());
+      var result = sut.CompileFile(new List<string> { @"someFolder\someFileName1.java", @"someFolder\someFileName2.java" });
+      appExecuterMock.Verify(x => x.Execute("javac", "someFolder", "-g -Xlint -encoding UTF8 \"someFileName1.java\" \"someFileName2.java\""), Times.Once());
     }
 
     [Fact]
@@ -29,7 +30,7 @@ namespace HomeworkCheckerLibTest
 
       var sut = new JavaCompiler(appExecuterMock.Object);
 
-      var result = sut.CompileFile(@"someFolder\someFileName.java");
+      var result = sut.CompileFile(new List<string> { @"someFolder\someFileName.java" });
       result.CompileSucceeded.Should().BeFalse();
       result.CompileOutput.Should().Be("someFileName.java:4: error: <identifier> expected");
     }

@@ -9,12 +9,13 @@
       this.appExecuter = appExecuter;
     }
 
-    internal CompileResult CompileFile(string javaFilePath)
+    internal CompileResult CompileFile(IEnumerable<string> javaFilePaths)
     {
-      var workingDirectory = Path.GetDirectoryName(javaFilePath);
-      var javaFile = Path.GetFileName(javaFilePath);
+      var workingDirectory = Path.GetDirectoryName(javaFilePaths.First());
+      var javaFiles = javaFilePaths.Select(f => string.Format($"\"{Path.GetFileName(f)}\""));
 
-      var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-g -Xlint -encoding UTF8 \"{javaFile}\"");
+      var filesString = string.Join(' ', javaFiles);
+      var executeResult = appExecuter.Execute("javac", workingDirectory!, $"-g -Xlint -encoding UTF8 {filesString}");
 
       return new(executeResult.ExitCode == 0, executeResult.Output);
     }
