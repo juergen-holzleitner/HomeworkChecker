@@ -53,6 +53,8 @@
 
     private FileAnalysisResult ProcessFileAnalysis(string outputName, string javaFile, InputGenerator.InputData inputData)
     {
+      var javaFiles = new List<string>() { javaFile };
+
       output.WriteInfo($"processing {outputName}");
 
       var compileOutput = string.Empty;
@@ -86,7 +88,7 @@
       else
         output.WriteSuccess("custom analysis processed");
 
-      var checkstyleResult = checkstyleProcessor.Process(javaFile);
+      var checkstyleResult = checkstyleProcessor.Process(javaFiles);
       if (checkstyleResult.ExitCode != 0 || !string.IsNullOrEmpty(checkstyleResult.CheckstyleOutput))
         output.WriteWarning("checkstyle issues");
       else

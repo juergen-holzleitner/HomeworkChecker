@@ -13,15 +13,17 @@ namespace HomeworkCheckerLib
       this.appExecuter = appExecuter;
     }
 
-    internal CheckstyleResult Process(string javaPath)
+    internal CheckstyleResult Process(IEnumerable<string> javaFiles)
     {
+      var filesString = string.Join(' ', javaFiles.Select(fileName => string.Format($"\"{fileName}\"")));
+
       var currentFolder = appExecuter.GetCurrentFolder();
-      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "checkstyle"), $"-jar \"checkstyle-10.3.3-all.jar\" -c google_checks_modified.xml \"{javaPath}\"");
+      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "checkstyle"), $"-jar \"checkstyle-10.3.3-all.jar\" -c google_checks_modified.xml {filesString}");
 
       Debug.Assert(result.ExitCode == 0, $"checkstyle is not expected to return {result.ExitCode}");
 
       var output = CleanOutput(result.Output);
-      var basePath = Path.GetDirectoryName(javaPath);
+      var basePath = Path.GetDirectoryName(javaFiles.First());
       if (!string.IsNullOrEmpty(basePath))
         output = RemovePathsFromOutput(output, basePath + Path.DirectorySeparatorChar);
 

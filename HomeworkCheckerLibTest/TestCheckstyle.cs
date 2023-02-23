@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using HomeworkCheckerLib;
 using Moq;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -18,9 +19,25 @@ namespace HomeworkCheckerLibTest
 
       var sut = new CheckstyleProcessor(appExecuterMock.Object);
 
-      var result = sut.Process(@"somePath\file.java");
+      var result = sut.Process(new List<string> { @"somePath\file.java" });
 
       result.CheckstyleOutput.Should().Be("file.java:25: checkstyle output");
+      result.ExitCode.Should().Be(0);
+    }
+
+    [Fact]
+    public void Can_process_checkstyle_with_multiple_files()
+    {
+      var appExecuterMock = new Mock<IAppExecuter>();
+      appExecuterMock.Setup(x => x.GetCurrentFolder()).Returns("currentFolder");
+      appExecuterMock.Setup(x => x.Execute("java", Path.Combine("currentFolder", "checkstyle"), "-jar \"checkstyle-10.3.3-all.jar\" -c google_checks_modified.xml \"somePath\\file1.java\" \"somePath\\file2.java\""))
+        .Returns(new IAppExecuter.ExecutionResult(0, "Starting audit...\r\nsomePath\\file2.java:25: checkstyle outputAudit done.\r\n", false));
+
+      var sut = new CheckstyleProcessor(appExecuterMock.Object);
+
+      var result = sut.Process(new List<string> { @"somePath\file1.java", @"somePath\file2.java" });
+
+      result.CheckstyleOutput.Should().Be("file2.java:25: checkstyle output");
       result.ExitCode.Should().Be(0);
     }
 
