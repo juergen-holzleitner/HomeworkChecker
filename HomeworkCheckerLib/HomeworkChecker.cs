@@ -82,7 +82,7 @@
         }
       }
 
-      var customAnalysisResult = customAnalysisProcessor.Process(javaFile);
+      var customAnalysisResult = customAnalysisProcessor.Process(javaFiles);
       if (!string.IsNullOrEmpty(customAnalysisResult.CustomAnalysisOutput))
         output.WriteWarning("custom analysis issues");
       else

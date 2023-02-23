@@ -14,18 +14,20 @@ namespace HomeworkCheckerLib
       this.filesystemService = filesystemService;
     }
 
-    public CustomAnalysisResult Process(string javaFile)
+    public CustomAnalysisResult Process(IEnumerable<string> javaFiles)
     {
       var sb = new StringBuilder();
 
-      var fileContent = filesystemService.ReadFileContent(javaFile);
-      using (StringReader reader = new(fileContent))
+      foreach (var javaFile in javaFiles)
       {
+        var fileContent = filesystemService.ReadFileContent(javaFile);
+        using StringReader reader = new(fileContent);
+        
         int lineNumber = 1;
         string? line;
         while ((line = reader.ReadLine()) != null)
         {
-          AnalyzeLine(lineNumber, line, sb);
+          AnalyzeLine(javaFile, lineNumber, line, sb);
           ++lineNumber;
         }
       }
@@ -33,7 +35,7 @@ namespace HomeworkCheckerLib
       return new(sb.ToString());
     }
 
-    internal static void AnalyzeLine(int lineNumber, string line, StringBuilder sb)
+    internal static void AnalyzeLine(string fileName, int lineNumber, string line, StringBuilder sb)
     {
       var checks = new List<(string regEx, string errorMessage)>()
       {
@@ -53,7 +55,7 @@ namespace HomeworkCheckerLib
       {
         var regEx = new Regex(check.regEx);
         if (regEx.IsMatch(line))
-          sb.AppendLine($"{lineNumber}: " + check.errorMessage);
+          sb.AppendLine($"{Path.GetFileName(fileName)} ({lineNumber}): " + check.errorMessage);
       }
     }
   }
