@@ -94,7 +94,7 @@
       else
         output.WriteSuccess("checkstyle processed");
 
-      var pmdResult = pmdProcessor.Process(javaFile);
+      var pmdResult = pmdProcessor.Process(javaFiles);
       if (pmdResult.ExitCode != 0 || !string.IsNullOrEmpty(pmdResult.PMDOutput))
         output.WriteWarning("PMD issues");
       else

@@ -13,10 +13,12 @@ namespace HomeworkCheckerLib
       this.appExecuter = appExecuter;
     }
 
-    internal PMDResult Process(string javaPath)
+    internal PMDResult Process(IEnumerable<string> javaFiles)
     {
+      var directoryToAnalyze = Path.GetDirectoryName(javaFiles.First());
+
       var currentFolder = appExecuter.GetCurrentFolder();
-      var result = appExecuter.Execute("cmd.exe", Path.Combine(currentFolder, "pmd", "bin"), $"/c pmd.bat -d \"{javaPath}\" -R Rules.xml -f text --short-names --no-cache -language java");
+      var result = appExecuter.Execute("cmd.exe", Path.Combine(currentFolder, "pmd", "bin"), $"/c pmd.bat -d \"{directoryToAnalyze}\" -R Rules.xml -f text --short-names --no-cache -language java");
 
       Debug.Assert(result.ExitCode == 0 || result.ExitCode == 4, $"PMD is not expected to return {result.ExitCode}");
 
