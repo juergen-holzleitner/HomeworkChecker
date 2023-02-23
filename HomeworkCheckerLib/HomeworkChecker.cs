@@ -103,7 +103,7 @@
       var spotBugsOutput = string.Empty;
       if (compileResult.CompileSucceeded)
       {
-        var spotBugsResult = spotBugsProcessor.Process(javaFile);
+        var spotBugsResult = spotBugsProcessor.Process(javaFiles);
         if (spotBugsResult.ExitCode != 0)
           output.WriteError("SpotBugs failed");
         else if (!string.IsNullOrEmpty(spotBugsResult.SpotBugsOutput))

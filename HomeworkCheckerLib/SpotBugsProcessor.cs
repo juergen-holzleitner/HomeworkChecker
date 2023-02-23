@@ -13,12 +13,12 @@ namespace HomeworkCheckerLib
       this.appExecuter = appExecuter;
     }
 
-    internal SpotBugsResult Process(string javaPath)
+    internal SpotBugsResult Process(IEnumerable<string> javaFiles)
     {
-      var classFileName = Path.ChangeExtension(javaPath, "class");
+      var filesString = string.Join(' ', javaFiles.Select(p => string.Format($"\"{Path.ChangeExtension(p, "class")}\"")));
 
       var currentFolder = appExecuter.GetCurrentFolder();
-      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "spotbugs", "lib"), $"-jar spotbugs.jar -textui -effort:max -low -longBugCodes -dontCombineWarnings -exclude ..\\exclude.xml \"{classFileName}\"");
+      var result = appExecuter.Execute("java", Path.Combine(currentFolder, "spotbugs", "lib"), $"-jar spotbugs.jar -textui -effort:max -low -longBugCodes -dontCombineWarnings -exclude ..\\exclude.xml {filesString}");
 
       Debug.Assert(result.ExitCode == 0, $"spotbugs is not expected to return {result.ExitCode}");
 
