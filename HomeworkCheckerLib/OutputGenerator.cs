@@ -3,11 +3,13 @@
   internal class OutputGenerator
   {
     private readonly IAppExecuter appExecuter;
+    private readonly FilesystemService.IFileEnumerator fileEnumerator;
 
     internal record Output(int ExitCode, string Content, bool HasTimedOut);
 
-    public OutputGenerator(IAppExecuter appExecuter)
+    public OutputGenerator(FilesystemService.IFileEnumerator fileEnumerator, IAppExecuter appExecuter)
     {
+      this.fileEnumerator = fileEnumerator;
       this.appExecuter = appExecuter;
     }
 
@@ -23,6 +25,12 @@
     internal Output GenerateOutput(string fileName)
     {
       return GenerateOutput(fileName, null);
+    }
+
+    internal bool IsRunnableViaMain(string javaFile)
+    {
+      var fileContent = fileEnumerator.ReadFileContent(javaFile);
+      return fileContent.Contains("main");
     }
   }
 }

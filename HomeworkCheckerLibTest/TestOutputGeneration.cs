@@ -15,7 +15,7 @@ namespace HomeworkCheckerLibTest
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(a => a.Execute("java", "workingDir", "fileName", "inputContent", 5000))
                      .Returns(new IAppExecuter.ExecutionResult(0, "output content", false));
-      var sut = new OutputGenerator(appExecuterMock.Object);
+      var sut = new OutputGenerator(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object);
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
@@ -28,7 +28,7 @@ namespace HomeworkCheckerLibTest
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(a => a.Execute("java", "workingDir", "fileName", "inputContent", 5000))
                      .Returns(new IAppExecuter.ExecutionResult(1, "output content", true));
-      var sut = new OutputGenerator(appExecuterMock.Object);
+      var sut = new OutputGenerator(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object);
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"), "inputContent");
 
@@ -36,12 +36,12 @@ namespace HomeworkCheckerLibTest
     }
 
     [Fact]
-    public void Can_generate_output_without_input_files_XXX()
+    public void Can_generate_output_without_input_files()
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(a => a.Execute("java", "workingDir", "fileName", null, 5000))
                      .Returns(new IAppExecuter.ExecutionResult(0, "output content", false));
-      var sut = new OutputGenerator(appExecuterMock.Object);
+      var sut = new OutputGenerator(Mock.Of<FilesystemService.IFileEnumerator>(), appExecuterMock.Object);
 
       var output = sut.GenerateOutput(Path.Combine("workingDir", "fileName.java"));
 
@@ -49,7 +49,7 @@ namespace HomeworkCheckerLibTest
     }
 
     [Fact]
-    public void Can_generate_output_without_input_files()
+    public void Can_generate_homeworkChecker_output_without_input_files()
     {
       var appExecuterMock = new Mock<IAppExecuter>();
       appExecuterMock.Setup(x => x.Execute("java", "solutionfolder", "program", null, It.IsAny<int>()))
@@ -62,5 +62,30 @@ namespace HomeworkCheckerLibTest
       outputs.Should().Equal(new List<HomeworkChecker.Output> { new(new("[no input]", string.Empty), 0, "output", false) });
     }
 
+    [Fact]
+    public void Can_check_if_java_file_has_main()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+      fileEnumerator.Setup(x => x.ReadFileContent(It.IsAny<string>())).Returns("public static void main(String[] args) {");
+
+      var sut = new OutputGenerator(fileEnumerator.Object, Mock.Of<IAppExecuter>());
+
+      var result = sut.IsRunnableViaMain("file.java");
+
+      result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Can_check_if_java_file_has_no_main()
+    {
+      var fileEnumerator = new Mock<FilesystemService.IFileEnumerator>();
+      fileEnumerator.Setup(x => x.ReadFileContent(It.IsAny<string>())).Returns("public class Klazz {");
+
+      var sut = new OutputGenerator(fileEnumerator.Object, Mock.Of<IAppExecuter>());
+
+      var result = sut.IsRunnableViaMain("file.java");
+
+      result.Should().BeFalse();
+    }
   }
 }

@@ -28,7 +28,7 @@
       this.appExecuter = appExecuter;
       this.output = output;
       inputGenerator = new InputGenerator(filesystemService);
-      outputGenerator = new OutputGenerator(appExecuter);
+      outputGenerator = new OutputGenerator(fileEnumerator, appExecuter);
       checkstyleProcessor = new CheckstyleProcessor(appExecuter);
       pmdProcessor = new PMDProcessor(appExecuter);
       spotBugsProcessor = new SpotBugsProcessor(appExecuter);
