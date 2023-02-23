@@ -37,6 +37,11 @@
       duplicateFileAnalyzer = new DuplicateFileAnalyzer(filesystemService);
     }
 
+    public IEnumerable<string> GetAllFoldersWithCode(string solutionFolder)
+    {
+      return filesystemService.GetAllHomeWorkFolders(solutionFolder);
+    }
+
     public FileAnalysisResult ProcessSolution(string solutionFolder)
     {
       var inputData = inputGenerator.GetInputs(solutionFolder);

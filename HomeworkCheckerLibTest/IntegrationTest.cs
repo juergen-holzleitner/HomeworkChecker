@@ -11,6 +11,28 @@ namespace HomeworkCheckerLibTest
   public class IntegrationTest
   {
     [Fact]
+    public void Can_enumerate_folders_with_code()
+    {
+      const string solutionFolder = @"arbitraryFolder";
+
+      var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
+      fileEnumeratorMock.Setup(
+        f => f.GetFilesInFolderRecursivly(solutionFolder, "*.java"))
+              .Returns(new List<string> 
+              {
+                @$"{solutionFolder}\FolderA\someFile.java",
+                @$"{solutionFolder}\FolderB\someFile.java",
+                @$"{solutionFolder}\FolderC\someFile.java" 
+              });
+
+      var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());
+
+      var folders = sut.GetAllFoldersWithCode(solutionFolder);
+
+      folders.Should().BeEquivalentTo(new[] { @$"{solutionFolder}\FolderA", @$"{solutionFolder}\FolderB", @$"{solutionFolder}\FolderC" });
+    }
+
+    [Fact]
     public void Can_process_Solution_folder()
     {
       const string solutionFolder = @"arbitraryFolder";

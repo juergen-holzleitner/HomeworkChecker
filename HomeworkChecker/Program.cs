@@ -50,10 +50,20 @@
     private static void ProcessSolution(string solutionFolder)
     {
       var homeworkChecker = new HomeworkCheckerLib.HomeworkChecker();
-      var analysisResult = homeworkChecker.ProcessSolution(solutionFolder);
-      homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
+      var folders = homeworkChecker.GetAllFoldersWithCode(solutionFolder);
+
+      var analysisResults = new List<HomeworkCheckerLib.HomeworkChecker.FileAnalysisResult>();
+      foreach (var folder in folders)
+      {
+        var analysisResult = homeworkChecker.ProcessSolution(folder);
+        analysisResults.Add(analysisResult);
+        homeworkChecker.WriteAnalysisToMarkdownFile(analysisResult);
+      }
       if (homeworkChecker.StartVSCodeWithFolder(solutionFolder) == 0)
-        homeworkChecker.CleanUpMarkdownFiles(analysisResult);
+      {
+        foreach (var analysisResult in analysisResults)
+          homeworkChecker.CleanUpMarkdownFiles(analysisResult);
+      }
     }
   }
 }
