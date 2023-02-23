@@ -22,7 +22,7 @@ namespace HomeworkCheckerLib
       {
         var fileContent = filesystemService.ReadFileContent(javaFile);
         using StringReader reader = new(fileContent);
-        
+
         int lineNumber = 1;
         string? line;
         while ((line = reader.ReadLine()) != null)

@@ -39,7 +39,7 @@ namespace HomeworkCheckerLib
       var duplicateString = "<span style=\"color:Yellow;font-weight:bold;\">" + string.Join(Environment.NewLine, d) + "</span>";
       AppendAnalysisIssue(sb, "duplicate problems", duplicateString);
     }
-    
+
     private static string GenerateShortFileName(string javaFile, string baseFolder)
     {
       var outputName = javaFile[baseFolder.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);

@@ -1,11 +1,7 @@
 ﻿using FluentAssertions;
 using HomeworkCheckerLib;
 using Moq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace HomeworkCheckerLibTest
@@ -120,7 +116,7 @@ namespace HomeworkCheckerLibTest
       var sut = new PercentageAdder(Mock.Of<FilesystemService.IFileEnumerator>(), Mock.Of<IRuntimeOutput>());
 
       var percentage = sut.GetPercentageFromLine("fileA.java", 1, line);
- 
+
       percentage.Should().Be(expectedValue);
     }
 
@@ -155,9 +151,7 @@ namespace HomeworkCheckerLibTest
     [InlineData("// [50%]", null)]
     public void Can_determine_line_with_total_value(string line, int? expectedValue)
     {
-      var sut = new PercentageAdder(Mock.Of<FilesystemService.IFileEnumerator>(), Mock.Of<IRuntimeOutput>());
-
-      var totalPercentage = sut.GetTotalPercentageValue(line);
+      var totalPercentage = PercentageAdder.GetTotalPercentageValue(line);
 
       totalPercentage.Should().Be(expectedValue);
     }

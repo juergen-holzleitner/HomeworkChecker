@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace HomeworkCheckerLib
 {
-  public class JplagProcessor
+  public partial class JplagProcessor
   {
     private readonly IAppExecuter appExecuter;
     private readonly FilesystemService.IFileEnumerator filesystemService;
@@ -50,9 +50,9 @@ namespace HomeworkCheckerLib
     {
       jplagOutput = RevertInvalidJavaOutputEncoding(jplagOutput);
 
-      var regex = new Regex(@"Comparing ""(?<fileA>.+)"" - ""(?<fileB>.+)"": (?<result>.+)");
+      var regex = RegExJplag();
       var matches = regex.Matches(jplagOutput);
-      foreach (Match match in matches)
+      foreach (Match match in matches.Cast<Match>())
       {
         var fileA = match.Groups["fileA"].Value;
         var fileB = match.Groups["fileB"].Value;
@@ -74,7 +74,10 @@ namespace HomeworkCheckerLib
       var resultA = from s in similarities where s.FileA == submissionFile select new SubmissionSimilarity(s.FileB, s.Similarity);
       var resultB = from s in similarities where s.FileB == submissionFile select new SubmissionSimilarity(s.FileA, s.Similarity);
 
-      return Enumerable.Union(resultA, resultB);
+      return resultA.Union(resultB);
     }
+
+    [GeneratedRegex("Comparing \"(?<fileA>.+)\" - \"(?<fileB>.+)\": (?<result>.+)")]
+    private static partial Regex RegExJplag();
   }
 }

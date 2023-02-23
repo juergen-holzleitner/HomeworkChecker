@@ -218,7 +218,7 @@ ouput content
 ");
     }
 
-        [Fact]
+    [Fact]
     public void Can_write_output_difference_with_whitespace_only()
     {
       var input = new HomeworkChecker.Input("inputFile.txt", "input content");

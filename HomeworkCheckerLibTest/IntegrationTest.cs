@@ -18,11 +18,11 @@ namespace HomeworkCheckerLibTest
       var fileEnumeratorMock = new Mock<FilesystemService.IFileEnumerator>();
       fileEnumeratorMock.Setup(
         f => f.GetFilesInFolderRecursivly(solutionFolder, "*.java"))
-              .Returns(new List<string> 
+              .Returns(new List<string>
               {
                 @$"{solutionFolder}\FolderA\someFile.java",
                 @$"{solutionFolder}\FolderB\someFile.java",
-                @$"{solutionFolder}\FolderC\someFile.java" 
+                @$"{solutionFolder}\FolderC\someFile.java"
               });
 
       var sut = new HomeworkChecker(fileEnumeratorMock.Object, Mock.Of<IAppExecuter>(), Mock.Of<IRuntimeOutput>());

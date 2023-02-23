@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace HomeworkCheckerLib
 {
@@ -17,7 +12,7 @@ namespace HomeworkCheckerLib
 
     internal PercentageAdder(FilesystemService.IFileEnumerator fileEnumerator, IRuntimeOutput output)
     {
-      filesystemService = new (fileEnumerator);
+      filesystemService = new(fileEnumerator);
       this.output = output;
     }
     public void ProcessPercentages(string folder)
@@ -147,7 +142,7 @@ namespace HomeworkCheckerLib
         output.WriteWarning($"{outputName}:{lineNumber}: {line[pos..]}");
     }
 
-    internal int? GetTotalPercentageValue(string line)
+    internal static int? GetTotalPercentageValue(string line)
     {
       var totalPattern = new Regex(@".*?//.*?\[\s*Total:\s*(?<percentage>[+-]?\d+)\s*%\s*\]");
       var match = totalPattern.Match(line);
